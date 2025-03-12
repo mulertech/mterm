@@ -1,0 +1,31 @@
+{
+  "name": "mulertech/mterm",
+  "description": "This application is a PHP CLI.",
+  "type": "project",
+  "keywords": ["cli", "php", "tools", "terminal"],
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sébastien Muler",
+      "email": "sebastien.muler@mulertech.net"
+    }
+  ],
+  "require": {
+    "php": "^8.2"
+  },
+  "require-dev": {
+    "mulertech/docker-tests": "^1",
+    "phpunit/phpunit": "^11"
+  },
+  "autoload": {
+    "psr-4": {
+      "MulerTech\\MTerm\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MulerTech\\MTerm\\Tests\\": "tests/"
+    }
+  }
+}
