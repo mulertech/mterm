@@ -2,10 +2,17 @@
 
 namespace MulerTech\MTerm\Command;
 
+use InvalidArgumentException;
+
+/**
+ * Class CommandRegistry
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class CommandRegistry
 {
     /**
-     * @var CommandInterface[]
+     * @var array<string,CommandInterface> $commands Registered commands
      */
     private array $commands = [];
 
@@ -59,12 +66,12 @@ class CommandRegistry
      * @param string $name Command name
      * @param array $args Command arguments
      * @return int Exit code
-     * @throws \InvalidArgumentException When command doesn't exist
+     * @throws InvalidArgumentException When command doesn't exist
      */
     public function execute(string $name, array $args = []): int
     {
         if (!$this->has($name)) {
-            throw new \InvalidArgumentException("Command '{$name}' not found");
+            throw new InvalidArgumentException("Command '{$name}' not found");
         }
 
         return $this->get($name)->execute($args);

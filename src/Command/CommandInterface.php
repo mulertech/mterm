@@ -2,6 +2,11 @@
 
 namespace MulerTech\MTerm\Command;
 
+/**
+ * Interface CommandInterface
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 interface CommandInterface
 {
     /**

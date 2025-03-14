@@ -2,6 +2,11 @@
 
 namespace MulerTech\MTerm\Utils;
 
+/**
+ * Class Output
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class Output
 {
     /**

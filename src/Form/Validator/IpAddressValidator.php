@@ -2,10 +2,22 @@
 
 namespace MulerTech\MTerm\Form\Validator;
 
+/**
+ * Class IpAddressValidator
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class IpAddressValidator extends AbstractValidator
 {
     private int $flags;
 
+    /**
+     * @param bool $allowIPv4
+     * @param bool $allowIPv6
+     * @param bool $allowPrivate
+     * @param bool $allowReserved
+     * @param string $errorMessage
+     */
     public function __construct(
         bool $allowIPv4 = true,
         bool $allowIPv6 = true,
@@ -30,7 +42,11 @@ class IpAddressValidator extends AbstractValidator
         parent::__construct($errorMessage);
     }
 
-    public function validate($value): ?string
+    /**
+     * @param mixed $value
+     * @return string|null
+     */
+    public function validate(mixed $value): ?string
     {
         if ($value === null || $value === '') {
             return null;

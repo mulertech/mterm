@@ -2,11 +2,21 @@
 
 namespace MulerTech\MTerm\Form\Validator;
 
+/**
+ * Class ChoiceValidator
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class ChoiceValidator extends AbstractValidator
 {
     private array $choices;
     private bool $strict;
 
+    /**
+     * @param array $choices
+     * @param bool $strict
+     * @param string $errorMessage
+     */
     public function __construct(
         array $choices,
         bool $strict = true,
@@ -17,7 +27,11 @@ class ChoiceValidator extends AbstractValidator
         parent::__construct($errorMessage);
     }
 
-    public function validate($value): ?string
+    /**
+     * @param mixed $value
+     * @return string|null
+     */
+    public function validate(mixed $value): ?string
     {
         if ($value === null || $value === '') {
             return null;

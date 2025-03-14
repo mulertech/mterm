@@ -2,31 +2,52 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+/**
+ * Class NumberField
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class NumberField extends AbstractField
 {
     protected ?float $min = null;
     protected ?float $max = null;
     protected bool $allowFloat = true;
 
+    /**
+     * @param float|null $min
+     * @return $this
+     */
     public function setMin(?float $min): self
     {
         $this->min = $min;
         return $this;
     }
 
+    /**
+     * @param float|null $max
+     * @return $this
+     */
     public function setMax(?float $max): self
     {
         $this->max = $max;
         return $this;
     }
 
+    /**
+     * @param bool $allowFloat
+     * @return $this
+     */
     public function setAllowFloat(bool $allowFloat): self
     {
         $this->allowFloat = $allowFloat;
         return $this;
     }
 
-    public function processInput($input)
+    /**
+     * @param string $input
+     * @return string|int|float|null
+     */
+    public function processInput(string $input): string|int|null|float
     {
         if ($input === '') {
             return $this->defaultValue;
@@ -35,7 +56,11 @@ class NumberField extends AbstractField
         return $this->allowFloat ? (float)$input : (int)$input;
     }
 
-    public function validate($value): array
+    /**
+     * @param string|null $value
+     * @return array
+     */
+    public function validate(?string $value): array
     {
         $errors = parent::validate($value);
 

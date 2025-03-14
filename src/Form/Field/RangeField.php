@@ -2,10 +2,19 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+/**
+ * Class RangeField
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class RangeField extends NumberField
 {
     private int $step = 1;
 
+    /**
+     * @param string $name
+     * @param string $label
+     */
     public function __construct(string $name, string $label)
     {
         parent::__construct($name, $label);
@@ -13,18 +22,29 @@ class RangeField extends NumberField
         $this->setMax(100);
     }
 
+    /**
+     * @param int $step
+     * @return $this
+     */
     public function setStep(int $step): self
     {
         $this->step = max(1, $step);
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getStep(): int
     {
         return $this->step;
     }
 
-    public function validate($value): array
+    /**
+     * @param string|null $value
+     * @return array
+     */
+    public function validate(?string $value): array
     {
         $errors = parent::validate($value);
 

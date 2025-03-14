@@ -2,6 +2,11 @@
 
 namespace MulerTech\MTerm\Utils;
 
+/**
+ * Class ColorOutput
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class ColorOutput extends Output
 {
     public const BLACK = 'black';

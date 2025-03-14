@@ -2,24 +2,41 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+/**
+ * Class TextField
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class TextField extends AbstractField
 {
     protected int $minLength = 0;
     protected ?int $maxLength = null;
 
+    /**
+     * @param int $minLength
+     * @return $this
+     */
     public function setMinLength(int $minLength): self
     {
         $this->minLength = $minLength;
         return $this;
     }
 
+    /**
+     * @param int|null $maxLength
+     * @return $this
+     */
     public function setMaxLength(?int $maxLength): self
     {
         $this->maxLength = $maxLength;
         return $this;
     }
 
-    public function validate($value): array
+    /**
+     * @param string|null $value
+     * @return array
+     */
+    public function validate(?string $value): array
     {
         $errors = parent::validate($value);
 

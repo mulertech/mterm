@@ -2,6 +2,11 @@
 
 namespace MulerTech\MTerm\Core;
 
+/**
+ * Class Terminal
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class Terminal
 {
     private const COLORS = [
@@ -15,6 +20,10 @@ class Terminal
         'white' => '0;37',
     ];
 
+    /**
+     * @param string|null $prompt
+     * @return string
+     */
     public function read(string $prompt = null): string
     {
         if ($prompt !== null) {
@@ -24,6 +33,24 @@ class Terminal
         return trim(fgets(STDIN));
     }
 
+    /**
+     * @param string|null $prompt
+     * @return string
+     */
+    public function readChar(string $prompt = null): string
+    {
+        if ($prompt !== null) {
+            $this->write($prompt);
+        }
+
+        return fgetc(STDIN);
+    }
+
+    /**
+     * @param string $text
+     * @param string|null $color
+     * @return void
+     */
     public function write(string $text, string $color = null): void
     {
         if ($color !== null && isset(self::COLORS[$color]) && $this->supportsAnsi()) {
@@ -33,23 +60,47 @@ class Terminal
         }
     }
 
+    /**
+     * @param string $text
+     * @param string|null $color
+     * @return void
+     */
     public function writeLine(string $text, string $color = null): void
     {
         $this->write($text . PHP_EOL, $color);
     }
 
+    /**
+     * @return void
+     */
     public function clear(): void
     {
-        if ($this->supportsAnsi()) {
-            echo "\033[2J\033[H";
+        if (DIRECTORY_SEPARATOR === '/') {
+            system('clear');
         } else {
-            // Fallback for Windows or non-ANSI terminals
-            for ($i = 0; $i < 50; $i++) {
-                echo PHP_EOL;
-            }
+            system('cls');
         }
     }
 
+    /**
+     * @return void
+     */
+    public function specialMode(): void
+    {
+        system('stty -icanon -echo');
+    }
+
+    /**
+     * @return void
+     */
+    public function normalMode(): void
+    {
+        system('stty icanon echo');
+    }
+
+    /**
+     * @return bool
+     */
     private function supportsAnsi(): bool
     {
         return DIRECTORY_SEPARATOR === '/' ||

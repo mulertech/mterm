@@ -2,24 +2,41 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+/**
+ * Class FileField
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class FileField extends AbstractField
 {
     private array $allowedExtensions = [];
     private ?int $maxSize = null;
 
+    /**
+     * @param array $extensions
+     * @return $this
+     */
     public function setAllowedExtensions(array $extensions): self
     {
         $this->allowedExtensions = array_map('strtolower', $extensions);
         return $this;
     }
 
+    /**
+     * @param int $bytes
+     * @return $this
+     */
     public function setMaxSize(int $bytes): self
     {
         $this->maxSize = $bytes;
         return $this;
     }
 
-    public function processInput($input)
+    /**
+     * @param string $input
+     * @return string|int|null|float
+     */
+    public function processInput(string $input): string|int|null|float
     {
         if ($input === '') {
             return $this->defaultValue;
@@ -28,7 +45,11 @@ class FileField extends AbstractField
         return $input;
     }
 
-    public function validate($value): array
+    /**
+     * @param string|null $value
+     * @return array
+     */
+    public function validate(?string $value): array
     {
         $errors = parent::validate($value);
 

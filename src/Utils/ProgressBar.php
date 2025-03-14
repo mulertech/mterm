@@ -2,6 +2,11 @@
 
 namespace MulerTech\MTerm\Utils;
 
+/**
+ * Class ProgressBar
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class ProgressBar
 {
     private ColorOutput $output;
@@ -13,6 +18,14 @@ class ProgressBar
     private string $color;
     private ?float $startTime = null;
 
+    /**
+     * @param ColorOutput $output
+     * @param int $total
+     * @param int $width
+     * @param string $completeChar
+     * @param string $incompleteChar
+     * @param string $color
+     */
     public function __construct(
         ColorOutput $output,
         int $total = 100,

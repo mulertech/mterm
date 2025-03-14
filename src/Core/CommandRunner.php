@@ -2,6 +2,11 @@
 
 namespace MulerTech\MTerm\Core;
 
+/**
+ * Class CommandRunner
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class CommandRunner
 {
     /**

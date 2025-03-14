@@ -5,10 +5,13 @@ namespace MulerTech\MTerm\Form;
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\FieldInterface;
 
+/**
+ * Class Form
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class Form
 {
-    private string $name;
-    private Terminal $terminal;
     private FormRenderer $renderer;
     private array $fields = [];
     private array $values = [];
@@ -16,10 +19,11 @@ class Form
     private bool $isSubmitted = false;
     private bool $isValid = false;
 
-    public function __construct(string $name, Terminal $terminal)
+    /**
+     * @param Terminal $terminal
+     */
+    public function __construct(Terminal $terminal)
     {
-        $this->name = $name;
-        $this->terminal = $terminal;
         $this->renderer = new FormRenderer($terminal);
     }
 
@@ -47,7 +51,11 @@ class Form
         $this->errors = [];
 
         foreach ($this->fields as $field) {
-            $value = $this->renderer->renderField($field);
+            $value = match (true) {
+                $field->isMultipleInput() && $field->isMultipleSelection() => $this->renderer->renderSelectMultipleField($field),
+                $field->isMultipleInput() && !$field->isMultipleSelection() => $this->renderer->renderSelectSingleField($field),
+                default => $this->renderer->renderField($field),
+            };
             $this->values[$field->getName()] = $value;
 
             $fieldErrors = $field->validate($value);
@@ -101,7 +109,7 @@ class Form
      * @param string $fieldName Field name
      * @return mixed|null Field value or null if not found
      */
-    public function getValue(string $fieldName)
+    public function getValue(string $fieldName): mixed
     {
         return $this->values[$fieldName] ?? null;
     }

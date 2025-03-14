@@ -2,11 +2,21 @@
 
 namespace MulerTech\MTerm\Form\Validator;
 
+/**
+ * Class LengthValidator
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class LengthValidator extends AbstractValidator
 {
     private ?int $min;
     private ?int $max;
 
+    /**
+     * @param int|null $min
+     * @param int|null $max
+     * @param string|null $errorMessage
+     */
     public function __construct(
         ?int $min = null,
         ?int $max = null,
@@ -30,7 +40,11 @@ class LengthValidator extends AbstractValidator
         parent::__construct($errorMessage);
     }
 
-    public function validate($value): ?string
+    /**
+     * @param mixed $value
+     * @return string|null
+     */
+    public function validate(mixed $value): ?string
     {
         if ($value === null || $value === '') {
             return null;

@@ -4,22 +4,38 @@ namespace MulerTech\MTerm\Form\Field;
 
 use DateTime;
 
+/**
+ * Class DateField
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class DateField extends TextField
 {
     private string $format = 'Y-m-d';
 
+    /**
+     * @param string $format
+     * @return $this
+     */
     public function setFormat(string $format): self
     {
         $this->format = $format;
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getFormat(): string
     {
         return $this->format;
     }
 
-    public function processInput($input)
+    /**
+     * @param string $input
+     * @return string|int|null|float
+     */
+    public function processInput(string $input): string|int|null|float
     {
         if ($input === '') {
             return $this->defaultValue;
@@ -33,7 +49,11 @@ class DateField extends TextField
         return $date->format($this->format);
     }
 
-    public function validate($value): array
+    /**
+     * @param string|null $value
+     * @return array
+     */
+    public function validate(?string $value): array
     {
         $errors = parent::validate($value);
 

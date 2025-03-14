@@ -10,7 +10,7 @@ class AbstractValidatorTest extends TestCase
     public function testConstructorSetsErrorMessage(): void
     {
         $validator = new class('Custom error message') extends AbstractValidator {
-            public function validate($value): ?string
+            public function validate(mixed $value): ?string
             {
                 return null;
             }

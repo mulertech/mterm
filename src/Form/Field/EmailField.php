@@ -2,9 +2,18 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+/**
+ * Class EmailField
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class EmailField extends TextField
 {
-    public function validate($value): array
+    /**
+     * @param string|null $value
+     * @return array
+     */
+    public function validate(?string $value): array
     {
         $errors = parent::validate($value);
 

@@ -2,11 +2,21 @@
 
 namespace MulerTech\MTerm\Form\Validator;
 
+/**
+ * Class NumericRangeValidator
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class NumericRangeValidator extends AbstractValidator
 {
     private ?float $min;
     private ?float $max;
 
+    /**
+     * @param float|null $min
+     * @param float|null $max
+     * @param string|null $errorMessage
+     */
     public function __construct(
         ?float $min = null,
         ?float $max = null,
@@ -30,7 +40,11 @@ class NumericRangeValidator extends AbstractValidator
         parent::__construct($errorMessage);
     }
 
-    public function validate($value): ?string
+    /**
+     * @param mixed $value
+     * @return string|null
+     */
+    public function validate(mixed $value): ?string
     {
         if ($value === null || $value === '') {
             return null;

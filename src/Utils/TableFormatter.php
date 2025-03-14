@@ -2,6 +2,11 @@
 
 namespace MulerTech\MTerm\Utils;
 
+/**
+ * Class TableFormatter
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class TableFormatter
 {
     private ColorOutput $output;
@@ -10,6 +15,13 @@ class TableFormatter
     private string $cellColor;
     private int $padding;
 
+    /**
+     * @param ColorOutput $output
+     * @param string $headerColor
+     * @param string $borderColor
+     * @param string $cellColor
+     * @param int $padding
+     */
     public function __construct(
         ColorOutput $output,
         string $headerColor = ColorOutput::GREEN,

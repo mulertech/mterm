@@ -5,12 +5,23 @@ namespace MulerTech\MTerm\Form\Validator;
 use DateTime;
 use DateTimeInterface;
 
+/**
+ * Class DateValidator
+ * @package MulerTech\MTerm
+ * @author Sébastien Muler
+ */
 class DateValidator extends AbstractValidator
 {
     private string $format;
     private ?DateTimeInterface $minDate;
     private ?DateTimeInterface $maxDate;
 
+    /**
+     * @param string $format
+     * @param DateTimeInterface|null $minDate
+     * @param DateTimeInterface|null $maxDate
+     * @param string|null $errorMessage
+     */
     public function __construct(
         string             $format = 'Y-m-d',
         ?DateTimeInterface $minDate = null,
@@ -28,7 +39,11 @@ class DateValidator extends AbstractValidator
         parent::__construct($errorMessage);
     }
 
-    public function validate($value): ?string
+    /**
+     * @param mixed $value
+     * @return string|null
+     */
+    public function validate(mixed $value): ?string
     {
         if ($value === null || $value === '') {
             return null;
