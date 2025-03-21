@@ -44,11 +44,14 @@ class FormRenderer
         }
 
         if ($field instanceof SelectField) {
-            return $field->processInput();
+            $result = $field->processInput();
+            return is_array($result) ? $result : (string)$result;
         }
 
         $value = $this->terminal->read($prompt);
-        return $field->processInput($value);
+        $result = $field->processInput($value);
+
+        return is_array($result) ? $result : (string)$result;
     }
 
     /**

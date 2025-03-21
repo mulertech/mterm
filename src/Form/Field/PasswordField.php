@@ -56,8 +56,8 @@ class PasswordField extends TextField
      */
     public function parseInput(string $input): string
     {
-        if ($input === '' && !is_null($this->defaultValue)) {
-            return (string)$this->defaultValue;
+        if ($input === '' && is_string($this->defaultValue)) {
+            return $this->defaultValue;
         }
 
         return $input;
@@ -71,10 +71,13 @@ class PasswordField extends TextField
     public function processInput(string $input = ''): string
     {
         if (!$this->maskInput) {
-            return parent::processInput($input);
+            $result = parent::processInput($input);
+            return is_string($result) ? $result : $input;
         }
 
-        if ($this->terminal === null) {
+        $terminal = $this->terminal;
+
+        if ($terminal === null) {
             throw new \RuntimeException('Terminal must be set before calling processInput');
         }
 
@@ -82,17 +85,17 @@ class PasswordField extends TextField
 
         $prompt = $this->buildPrompt();
 
-        $this->terminal->write($prompt);
-        $this->terminal->specialMode();
+        $terminal->write($prompt);
+        $terminal->specialMode();
 
         $password = '';
 
         while (true) {
-            $char = $this->terminal->readChar();
+            $char = $terminal->readChar();
 
             // Enter key pressed
             if ($char === PHP_EOL) {
-                $this->terminal->writeLine('');
+                $terminal->writeLine('');
                 break;
             }
 
@@ -100,16 +103,16 @@ class PasswordField extends TextField
             if ($char === "\x7F" || $char === "\x08") {
                 if (strlen($password) > 0) {
                     $password = substr($password, 0, -1);
-                    $this->terminal->write("\x08 \x08");
+                    $terminal->write("\x08 \x08");
                 }
             } // Regular character
             elseif (ord($char) >= 32) {
                 $password .= $char;
-                $this->terminal->write($this->getMaskChar());
+                $terminal->write($this->getMaskChar());
             }
         }
 
-        $this->terminal->normalMode();
+        $terminal->normalMode();
         return $this->parseInput($password);
     }
 

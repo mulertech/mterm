@@ -2,6 +2,8 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+use MulerTech\MTerm\Core\Terminal;
+
 /**
  * Class SelectField
  * @package MulerTech\MTerm
@@ -66,9 +68,9 @@ class SelectField extends AbstractField
 
     /**
      * @param string $input
-     * @return string|array<int|string, string>
+     * @return string
      */
-    public function parseInput(string $input): string|array
+    public function parseInput(string $input): string
     {
         // Generate the selected options
         if ($this->multipleSelection) {
@@ -108,43 +110,47 @@ class SelectField extends AbstractField
      */
     public function processInput(string $input = ''): string|array
     {
-        if ($this->terminal === null) {
+        $terminal = $this->terminal;
+
+        if ($terminal === null) {
             throw new \RuntimeException('Terminal must be set before calling processInput');
         }
 
         $this->clearErrors();
 
         if ($this->isMultipleSelection()) {
-            return $this->renderSelectMultipleField();
+            return $this->renderSelectMultipleField($terminal);
         }
 
-        return $this->renderSelectSingleField();
+        return $this->renderSelectSingleField($terminal);
     }
 
     /**
      * @return array<int|string, string>
      */
-    public function renderSelectMultipleField(): array
+    public function renderSelectMultipleField(Terminal $terminal): array
     {
         $this->clearErrors();
 
-        $result = $this->handleSelectField();
+        $result = $this->handleSelectField($terminal);
 
         if ($result === true && $this->selectedOptions !== []) {
             return $this->selectedOptions;
         }
 
-        return $this->getDefault() ?? [];
+        $defaultValue = $this->getDefault() ?? [];
+
+        return is_array($defaultValue) ? $defaultValue : [];
     }
 
     /**
      * @return string
      */
-    public function renderSelectSingleField(): string
+    public function renderSelectSingleField(Terminal $terminal): string
     {
         $this->clearErrors();
 
-        $result = $this->handleSelectField();
+        $result = $this->handleSelectField($terminal);
 
         $defaultValue = $this->getDefault() ?? '';
         $defaultValue = is_string($defaultValue) ? $defaultValue : '';
@@ -155,7 +161,7 @@ class SelectField extends AbstractField
     /**
      * @return bool
      */
-    private function handleSelectField(): bool
+    private function handleSelectField(Terminal $terminal): bool
     {
         $prompt = $this->buildPrompt();
         $header = $prompt . PHP_EOL;
@@ -164,13 +170,13 @@ class SelectField extends AbstractField
             $header .= $this->getDescription() . PHP_EOL;
         }
 
-        $this->terminal->specialMode();
-        $this->terminal->write($header, 'cyan');
-        $this->terminal->write($this->parseInput(''));
+        $terminal->specialMode();
+        $terminal->write($header, 'cyan');
+        $terminal->write($this->parseInput(''));
 
-        $result = $this->handleSelectKeyboardInput($header);
+        $result = $this->handleSelectKeyboardInput($header, $terminal);
 
-        $this->terminal->normalMode();
+        $terminal->normalMode();
         return $result;
     }
 
@@ -178,30 +184,30 @@ class SelectField extends AbstractField
      * @param string $header
      * @return bool
      */
-    private function handleSelectKeyboardInput(string $header): bool
+    private function handleSelectKeyboardInput(string $header, Terminal $terminal): bool
     {
         while (true) {
-            $char = $this->terminal->readChar();
+            $char = $terminal->readChar();
 
             if ($char === PHP_EOL) { // Enter key
                 return true;
             }
 
             if ($char === "\033") {
-                $this->handleArrowKey($header);
+                $this->handleArrowKey($header, $terminal);
                 continue;
             }
 
             if ($char === ' ') {
-                $this->terminal->clear();
-                $this->terminal->write($header, 'cyan');
-                $this->terminal->write($this->parseInput('space'));
+                $terminal->clear();
+                $terminal->write($header, 'cyan');
+                $terminal->write($this->parseInput('space'));
             }
 
             if ($char === 'a') {
-                $this->terminal->clear();
-                $this->terminal->write($header, 'cyan');
-                $this->terminal->write($this->parseInput('a'));
+                $terminal->clear();
+                $terminal->write($header, 'cyan');
+                $terminal->write($this->parseInput('a'));
             }
         }
     }
@@ -210,19 +216,19 @@ class SelectField extends AbstractField
      * @param string $header
      * @return void
      */
-    private function handleArrowKey(string $header): void
+    private function handleArrowKey(string $header, Terminal $terminal): void
     {
-        $sequence = $this->terminal->readChar() . $this->terminal->readChar();
+        $sequence = $terminal->readChar() . $terminal->readChar();
 
         if ($sequence === "[A") { // Up arrow
-            $this->terminal->clear();
-            $this->terminal->write($header, 'cyan');
-            $this->terminal->write($this->parseInput('up'));
+            $terminal->clear();
+            $terminal->write($header, 'cyan');
+            $terminal->write($this->parseInput('up'));
         } elseif ($sequence === "[B") { // Down arrow
-            $this->terminal->clear();
-            $this->terminal->write($header, 'cyan');
-            $this->terminal->write($header, 'cyan');
-            $this->terminal->write($this->parseInput('down'));
+            $terminal->clear();
+            $terminal->write($header, 'cyan');
+            $terminal->write($header, 'cyan');
+            $terminal->write($this->parseInput('down'));
         }
     }
 

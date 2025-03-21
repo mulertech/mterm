@@ -69,7 +69,14 @@ class TableFormatter
      */
     private function calculateColumnWidths(array $headers, array $rows): array
     {
-        $widths = array_map('strlen', $headers);
+        $widths = [];
+        $i = 0;
+
+        // Utiliser des indices entiers explicites
+        foreach ($headers as $header) {
+            $widths[$i] = strlen($header);
+            $i++;
+        }
 
         foreach ($rows as $row) {
             $i = 0;
