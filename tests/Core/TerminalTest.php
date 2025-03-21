@@ -14,12 +14,13 @@ class TerminalTest extends TestCase
         $file = fopen(__DIR__ . DIRECTORY_SEPARATOR . 'input', 'r');
 
         $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['inputStream'])
+            ->onlyMethods(['inputStream', 'write'])
             ->getMock();
-
         $terminal->expects($this->once())
             ->method('inputStream')
             ->willReturn($file);
+        $terminal->expects($this->once())
+            ->method('write');
 
         $this->assertEquals('John Doe', $terminal->read('Enter name: '));
     }
@@ -29,12 +30,13 @@ class TerminalTest extends TestCase
         $file = fopen(__DIR__ . DIRECTORY_SEPARATOR . 'input', 'r');
 
         $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['inputStream'])
+            ->onlyMethods(['inputStream', 'write'])
             ->getMock();
-
         $terminal->expects($this->once())
             ->method('inputStream')
             ->willReturn($file);
+        $terminal->expects($this->once())
+            ->method('write');
 
         $this->assertEquals('J', $terminal->readChar('Enter name: '));
     }
@@ -114,7 +116,7 @@ class TerminalTest extends TestCase
         if (DIRECTORY_SEPARATOR === '/' ||
             (function_exists('sapi_windows_vt100_support') &&
                 @sapi_windows_vt100_support(STDOUT))) {
-            $result = "[H[J";
+            $result = "\033[H\033[J";
         } else {
             $result = str_repeat(PHP_EOL, 50);
         }

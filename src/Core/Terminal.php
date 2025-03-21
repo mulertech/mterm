@@ -32,7 +32,7 @@ class Terminal
      * @param string|null $prompt
      * @return string
      */
-    public function read(string $prompt = null): string
+    public function read(?string $prompt = null): string
     {
         if ($prompt !== null) {
             $this->write($prompt);
@@ -49,7 +49,7 @@ class Terminal
      * @param string|null $prompt
      * @return string
      */
-    public function readChar(string $prompt = null): string
+    public function readChar(?string $prompt = null): string
     {
         if ($prompt !== null) {
             $this->write($prompt);
@@ -68,7 +68,7 @@ class Terminal
      * @param bool $bold Whether to make text bold
      * @return void
      */
-    public function write(string $text, string $color = null, bool $bold = false): void
+    public function write(string $text, ?string $color = null, bool $bold = false): void
     {
         if ($color !== null && $this->supportsAnsi()) {
             $colorKey = $bold ? "bold_{$color}" : $color;
@@ -87,7 +87,7 @@ class Terminal
      * @param bool $bold Whether to make text bold
      * @return void
      */
-    public function writeLine(string $text, string $color = null, bool $bold = false): void
+    public function writeLine(string $text, ?string $color = null, bool $bold = false): void
     {
         $this->write($text . PHP_EOL, $color, $bold);
     }
