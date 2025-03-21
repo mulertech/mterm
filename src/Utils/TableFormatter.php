@@ -41,8 +41,8 @@ class TableFormatter
     /**
      * Format and terminal a table
      *
-     * @param array $headers Table headers
-     * @param array $rows Table data rows
+     * @param array<int|string, string> $headers Table headers
+     * @param array<int, array<int|string, string|int|float>> $rows Table data rows
      * @return void
      */
     public function renderTable(array $headers, array $rows): void
@@ -63,9 +63,9 @@ class TableFormatter
     /**
      * Calculate the width of each column
      *
-     * @param array $headers Table headers
-     * @param array $rows Table data rows
-     * @return array Array of column widths
+     * @param array<int|string, string> $headers Table headers
+     * @param array<int, array<int|string, string|int|float>> $rows Table data rows
+     * @return array<int, int> Array of column widths
      */
     private function calculateColumnWidths(array $headers, array $rows): array
     {
@@ -87,7 +87,7 @@ class TableFormatter
     /**
      * Draw horizontal separator line
      *
-     * @param array $columnWidths Array of column widths
+     * @param array<int, int> $columnWidths Array of column widths
      * @return void
      */
     private function drawSeparator(array $columnWidths): void
@@ -102,8 +102,8 @@ class TableFormatter
     /**
      * Draw a table row
      *
-     * @param array $row Row data
-     * @param array $columnWidths Array of column widths
+     * @param array<int|string, string|int|float> $row Row data
+     * @param array<int, int> $columnWidths Array of column widths
      * @param string $color Color for the row
      * @param bool $bold Whether to make text bold
      * @return void

@@ -26,9 +26,9 @@ class FormRenderer
 
     /**
      * @param FieldInterface $field
-     * @return string|int|float|array<int|string, string>|null
+     * @return string|array<int|string, string>
      */
-    public function renderField(FieldInterface $field): string|int|float|array|null
+    public function renderField(FieldInterface $field): string|array
     {
         $field->clearErrors();
         $field->setTerminal($this->terminal);
@@ -52,7 +52,7 @@ class FormRenderer
     }
 
     /**
-     * @param array $errors
+     * @param array<string> $errors
      * @return void
      */
     public function renderErrors(array $errors): void

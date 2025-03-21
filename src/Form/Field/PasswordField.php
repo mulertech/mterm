@@ -52,12 +52,12 @@ class PasswordField extends TextField
 
     /**
      * @param string $input
-     * @return string|int|float|array<int|string, string>
+     * @return string
      */
-    public function parseInput(string $input): string|int|float|array
+    public function parseInput(string $input): string
     {
         if ($input === '' && !is_null($this->defaultValue)) {
-            return $this->defaultValue;
+            return (string)$this->defaultValue;
         }
 
         return $input;
@@ -66,9 +66,9 @@ class PasswordField extends TextField
     /**
      * Process the password input with masking
      *
-     * @return string|int|float|array<int|string, string>
+     * @return string
      */
-    public function processInput(string $input = ''): string|int|float|array
+    public function processInput(string $input = ''): string
     {
         if (!$this->maskInput) {
             return parent::processInput($input);
@@ -114,6 +114,8 @@ class PasswordField extends TextField
     }
 
     /**
+     * Build the prompt string
+     *
      * @return string
      */
     private function buildPrompt(): string

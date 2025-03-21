@@ -9,11 +9,14 @@ namespace MulerTech\MTerm\Form\Validator;
  */
 class ChoiceValidator extends AbstractValidator
 {
+    /**
+     * @var array<int|string, mixed>
+     */
     private array $choices;
     private bool $strict;
 
     /**
-     * @param array $choices
+     * @param array<int|string, mixed> $choices
      * @param bool $strict
      * @param string $errorMessage
      */

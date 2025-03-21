@@ -127,7 +127,7 @@ class FormRendererTest extends TestCase
         $this->terminal->expects($this->once())->method('specialMode');
         $this->terminal->expects($this->exactly(5))->method('clear');
         $this->terminal
-            ->expects($this->exactly(8))
+            ->expects($this->exactly(10))
             ->method('write')
             ->withAnyParameters();
         $this->terminal->expects($this->once())->method('normalMode');

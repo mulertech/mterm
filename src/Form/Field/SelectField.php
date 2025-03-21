@@ -10,7 +10,7 @@ namespace MulerTech\MTerm\Form\Field;
 class SelectField extends AbstractField
 {
     /**
-     * @var array<int, string> $options
+     * @var array<int|string, string> $options
      */
     protected array $options = [];
     protected bool $multipleSelection = false;
@@ -20,7 +20,7 @@ class SelectField extends AbstractField
     protected string $cursorPresent = '*';
     private int $cursorPosition = 0;
     /**
-     * @var array<int, string> $selectedOptions
+     * @var array<int|string, string> $selectedOptions
      */
     protected array $selectedOptions = [];
 
@@ -37,7 +37,7 @@ class SelectField extends AbstractField
     }
 
     /**
-     * @param array<int, string> $options
+     * @param array<int|string, string> $options
      * @return $this
      */
     public function setOptions(array $options): self
@@ -66,9 +66,9 @@ class SelectField extends AbstractField
 
     /**
      * @param string $input
-     * @return string|int|float|array<int|string, string>
+     * @return string|array<int|string, string>
      */
-    public function parseInput(string $input): string|int|float|array
+    public function parseInput(string $input): string|array
     {
         // Generate the selected options
         if ($this->multipleSelection) {
@@ -104,9 +104,9 @@ class SelectField extends AbstractField
     /**
      * Process user input for this field
      *
-     * @return string|int|float|array<int|string, string>
+     * @return string|array<int|string, string>
      */
-    public function processInput(string $input = ''): string|int|float|array
+    public function processInput(string $input = ''): string|array
     {
         if ($this->terminal === null) {
             throw new \RuntimeException('Terminal must be set before calling processInput');
@@ -122,9 +122,9 @@ class SelectField extends AbstractField
     }
 
     /**
-     * @return array|null
+     * @return array<int|string, string>
      */
-    public function renderSelectMultipleField(): ?array
+    public function renderSelectMultipleField(): array
     {
         $this->clearErrors();
 
@@ -138,15 +138,16 @@ class SelectField extends AbstractField
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function renderSelectSingleField(): ?string
+    public function renderSelectSingleField(): string
     {
         $this->clearErrors();
 
         $result = $this->handleSelectField();
 
         $defaultValue = $this->getDefault() ?? '';
+        $defaultValue = is_string($defaultValue) ? $defaultValue : '';
 
         return $result === true ? $this->getCurrentOption() : $defaultValue;
     }
@@ -220,6 +221,7 @@ class SelectField extends AbstractField
         } elseif ($sequence === "[B") { // Down arrow
             $this->terminal->clear();
             $this->terminal->write($header, 'cyan');
+            $this->terminal->write($header, 'cyan');
             $this->terminal->write($this->parseInput('down'));
         }
     }
@@ -254,12 +256,14 @@ class SelectField extends AbstractField
     }
 
     /**
-     * @return int|string
+     * Get the current selected option key
+     *
+     * @return string
      */
-    public function getCurrentOption(): int|string
+    public function getCurrentOption(): string
     {
         $options = array_keys($this->options);
-        return $options[$this->cursorPosition] ?? '';
+        return (string)($options[$this->cursorPosition] ?? '');
     }
 
     /**
@@ -273,6 +277,8 @@ class SelectField extends AbstractField
     }
 
     /**
+     * Generate the select display
+     *
      * @param bool $multiple
      * @return string
      */

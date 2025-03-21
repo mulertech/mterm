@@ -106,8 +106,8 @@ class ProgressBar
         $percent = $this->total > 0 ? floor(($this->current / $this->total) * 100) : 0;
         $filledWidth = $this->total > 0 ? floor(($this->current / $this->total) * $this->width) : 0;
 
-        $bar = str_repeat($this->completeChar, $filledWidth);
-        $bar .= str_repeat($this->incompleteChar, $this->width - $filledWidth);
+        $bar = str_repeat($this->completeChar, (int)$filledWidth);
+        $bar .= str_repeat($this->incompleteChar, $this->width - (int)$filledWidth);
 
         $timeInfo = '';
         if ($this->startTime !== null) {

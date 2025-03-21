@@ -49,7 +49,7 @@ class DateValidator extends AbstractValidator
             return null;
         }
 
-        $date = DateTime::createFromFormat($this->format, $value);
+        $date = DateTime::createFromFormat($this->format, (string)$value);
         if ($date === false) {
             return $this->errorMessage;
         }
@@ -60,12 +60,20 @@ class DateValidator extends AbstractValidator
             return $this->errorMessage;
         }
 
-        if ($this->minDate !== null && $date < $this->minDate->setTime(0, 0)) {
-            return "Date must be on or after " . $this->minDate->format($this->format);
+        if ($this->minDate !== null) {
+            $minClone = clone $this->minDate;
+            $minTime = (new DateTime())->setTimestamp($minClone->getTimestamp())->setTime(0, 0);
+            if ($date < $minTime) {
+                return "Date must be on or after " . $this->minDate->format($this->format);
+            }
         }
 
-        if ($this->maxDate !== null && $date > $this->maxDate->setTime(23, 59, 59)) {
-            return "Date must be on or before " . $this->maxDate->format($this->format);
+        if ($this->maxDate !== null) {
+            $maxClone = clone $this->maxDate;
+            $maxTime = (new DateTime())->setTimestamp($maxClone->getTimestamp())->setTime(23, 59, 59);
+            if ($date > $maxTime) {
+                return "Date must be on or before " . $this->maxDate->format($this->format);
+            }
         }
 
         return null;
