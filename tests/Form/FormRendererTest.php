@@ -41,7 +41,7 @@ class FormRendererTest extends TestCase
         $this->terminal
             ->method('readChar')
             // Simulate deleting c character
-            ->willReturnOnConsecutiveCalls('s', 'e', 'c', "\x7F", 'r', 'e', 't', "\n");
+            ->willReturnOnConsecutiveCalls('s', 'e', 'c', "\x7F", 'r', 'e', 't', PHP_EOL);
         $this->terminal->expects($this->once())->method('normalMode');
 
         $form->handle();
@@ -106,7 +106,7 @@ class FormRendererTest extends TestCase
 
         // Terminal input sequence: Press Enter to select current option
         $this->terminal->method('readChar')
-            ->willReturn("\n");
+            ->willReturn(PHP_EOL);
 
         $form->handle();
         $this->assertEquals(['choice' => 'opt1'], $form->getValues());

@@ -2,7 +2,7 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
-use MulerTech\MTerm\Core\Terminal;
+use RuntimeException;
 
 /**
  * Class PasswordField
@@ -66,6 +66,7 @@ class PasswordField extends TextField
     /**
      * Process the password input with masking
      *
+     * @param string $input
      * @return string
      */
     public function processInput(string $input = ''): string
@@ -78,7 +79,7 @@ class PasswordField extends TextField
         $terminal = $this->terminal;
 
         if ($terminal === null) {
-            throw new \RuntimeException('Terminal must be set before calling processInput');
+            throw new RuntimeException('Terminal must be set before calling processInput');
         }
 
         $this->clearErrors();
@@ -101,7 +102,7 @@ class PasswordField extends TextField
 
             // Backspace handling
             if ($char === "\x7F" || $char === "\x08") {
-                if (strlen($password) > 0) {
+                if ($password !== '') {
                     $password = substr($password, 0, -1);
                     $terminal->write("\x08 \x08");
                 }

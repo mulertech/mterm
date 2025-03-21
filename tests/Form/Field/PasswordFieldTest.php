@@ -51,7 +51,7 @@ class PasswordFieldTest extends TestCase
     public function testProcessInputWithoutMaskInput(): void
     {
         $this->field->setMaskInput(false)->setDefault('secret');
-        $result = $this->field->processInput('');
+        $result = $this->field->processInput();
         $this->assertEquals('secret', $result);
     }
 
@@ -59,7 +59,7 @@ class PasswordFieldTest extends TestCase
     {
         $field = new PasswordField('password', 'Password');
         $field->setDefault('secret');
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $field->processInput();
     }
 
@@ -72,9 +72,10 @@ class PasswordFieldTest extends TestCase
         $this->terminal
             ->method('readChar')
             // Simulate deleting c character
-            ->willReturnOnConsecutiveCalls('s', 'e', 'c', "\x7F", 'r', 'e', 't', "\n");
+            ->willReturnOnConsecutiveCalls('s', 'e', 'c', "\x7F", 'r', 'e', 't', PHP_EOL);
         $this->terminal->expects($this->once())->method('writeLine');
         $this->terminal->expects($this->once())->method('normalMode');
+
         $result = $this->field->processInput('secret');
         $this->assertEquals('seret', $result);
     }
@@ -87,15 +88,15 @@ class PasswordFieldTest extends TestCase
         $this->terminal->expects($this->exactly(2))->method('specialMode');
         $this->terminal
             ->method('readChar')
-            ->willReturn("\n");
+            ->willReturn(PHP_EOL);
         $this->terminal->expects($this->exactly(2))->method('writeLine');
         $this->terminal->expects($this->exactly(2))->method('normalMode');
 
         // Test with no default value
-        $result = $this->field->processInput('');
+        $result = $this->field->processInput();
         $this->assertEquals('', $result);
         $this->field->setDefault('default');
-        $result = $this->field->processInput('');
+        $result = $this->field->processInput();
         $this->assertEquals('default', $result);
     }
 

@@ -4,6 +4,7 @@ namespace MulerTech\MTerm\Tests\Form\Field;
 
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\SelectField;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use RuntimeException;
@@ -12,11 +13,14 @@ class SelectFieldTest extends TestCase
 {
     private SelectField $field;
 
+    /**
+     * @throws Exception
+     */
     protected function setUp(): void
     {
-        $this->terminal = $this->createMock(Terminal::class);
+        $terminal = $this->createMock(Terminal::class);
         $this->field = new SelectField('select', 'Select Field');
-        $this->field->setTerminal($this->terminal);
+        $this->field->setTerminal($terminal);
     }
 
     public function testSetOptions(): void
@@ -93,7 +97,7 @@ class SelectFieldTest extends TestCase
     {
         $field = new SelectField('password', 'Password');
         $field->setDefault('secret');
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $field->processInput();
     }
 

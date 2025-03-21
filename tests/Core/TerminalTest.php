@@ -159,10 +159,10 @@ class TerminalTest extends TestCase
         $method = $reflection->getMethod('system');
 
         ob_start();
-        $method->invoke($terminal, 'echo "Hello"');
+        $method->invoke($terminal, 'echo Hello');
         $output = ob_get_clean();
 
-        $this->assertEquals('Hello' . PHP_EOL, $output);
+        $this->assertEquals("Hello" . PHP_EOL, $output);
     }
 
     public function testSupportsAnsi(): void
