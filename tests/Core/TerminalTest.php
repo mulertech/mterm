@@ -111,21 +111,14 @@ class TerminalTest extends TestCase
 
     public function testClearOnAnsiTerminalAndElse(): void
     {
-        $terminal = new Terminal();
+        $terminal = $this->getMockBuilder(Terminal::class)
+            ->onlyMethods(['system'])
+            ->getMock();
 
-        if (DIRECTORY_SEPARATOR === '/' ||
-            (function_exists('sapi_windows_vt100_support') &&
-                @sapi_windows_vt100_support(STDOUT))) {
-            $result = "\033[H\033[J";
-        } else {
-            $result = str_repeat(PHP_EOL, 50);
-        }
-
-        ob_start();
+        $terminal->expects($this->once())
+            ->method('system')
+            ->with($this->equalTo(DIRECTORY_SEPARATOR === '/' ? 'clear' : 'cls'));
         $terminal->clear();
-        $output = ob_get_clean();
-
-        $this->assertEquals($result, $output);
     }
 
     public function testSpecialMode(): void
