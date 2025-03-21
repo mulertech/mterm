@@ -9,12 +9,14 @@ use MulerTech\MTerm\Form\Field\Template\SelectMultipleArrowTemplate;
 use MulerTech\MTerm\Form\Field\Template\SelectSingleArrowTemplate;
 use MulerTech\MTerm\Form\Field\TextField;
 use MulerTech\MTerm\Form\Form;
+use MulerTech\MTerm\Form\FormRenderer;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 class FormRendererTest extends TestCase
 {
     private Terminal $terminal;
+    private FormRenderer $renderer;
 
     /**
      * @throws Exception
@@ -22,6 +24,7 @@ class FormRendererTest extends TestCase
     protected function setUp(): void
     {
         $this->terminal = $this->createMock(Terminal::class);
+        $this->renderer = new FormRenderer($this->terminal);
     }
 
     public function testRenderPasswordField(): void
@@ -250,5 +253,18 @@ class FormRendererTest extends TestCase
 
         $form->handle();
         $this->assertEquals(['test_field' => 'test value'], $form->getValues());
+    }
+
+    // Verify that terminal is correctly passed to fields
+    public function testTerminalInjection(): void
+    {
+        $field = $this->createMock(PasswordField::class);
+        $field->expects($this->once())->method('clearErrors');
+        $field->expects($this->once())->method('setTerminal')->with($this->terminal);
+        $field->expects($this->once())->method('getDescription')->willReturn(null);
+        $field->expects($this->once())->method('isMaskInput')->willReturn(true);
+        $field->expects($this->once())->method('processInput')->willReturn('test');
+
+        $this->renderer->renderField($field);
     }
 }

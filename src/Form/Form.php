@@ -69,13 +69,7 @@ class Form
             $this->renderer->clear();
         }
 
-        $value = match (true) {
-            $field instanceof SelectField
-            && $field->isMultipleSelection() => $this->renderer->renderSelectMultipleField($field),
-            $field instanceof SelectField
-            && !$field->isMultipleSelection() => $this->renderer->renderSelectSingleField($field),
-            default => $this->renderer->renderField($field),
-        };
+        $value = $this->renderer->renderField($field);
         $this->values[$field->getName()] = $value;
 
         $fieldErrors = $field->validate($value);

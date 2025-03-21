@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Validator\ValidatorInterface;
 
 /**
@@ -28,6 +29,7 @@ abstract class AbstractField implements FieldInterface
      */
     protected array $validators = [];
     protected bool $multipleInput = false;
+    protected ?Terminal $terminal = null;
 
     /**
      * @param string $name
@@ -110,27 +112,11 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @return array<string>
-     */
-    public function getErrors(): array
-    {
-        return $this->errors;
-    }
-
-    /**
      * @return void
      */
     public function clearErrors(): void
     {
         $this->errors = [];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isMultipleInput(): bool
-    {
-        return $this->multipleInput;
     }
 
     /**
@@ -181,5 +167,17 @@ abstract class AbstractField implements FieldInterface
         }
 
         return '';
+    }
+
+    /**
+     * Set terminal instance
+     *
+     * @param Terminal $terminal
+     * @return $this
+     */
+    public function setTerminal(Terminal $terminal): self
+    {
+        $this->terminal = $terminal;
+        return $this;
     }
 }

@@ -68,7 +68,7 @@ class SelectField extends AbstractField
      * @param string $input
      * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|float|array
+    public function parseInput(string $input): string|int|float|array
     {
         // Generate the selected options
         if ($this->multipleSelection) {
@@ -102,6 +102,129 @@ class SelectField extends AbstractField
     }
 
     /**
+     * Process user input for this field
+     *
+     * @return string|int|float|array<int|string, string>
+     */
+    public function processInput(string $input = ''): string|int|float|array
+    {
+        if ($this->terminal === null) {
+            throw new \RuntimeException('Terminal must be set before calling processInput');
+        }
+
+        $this->clearErrors();
+
+        if ($this->isMultipleSelection()) {
+            return $this->renderSelectMultipleField();
+        }
+
+        return $this->renderSelectSingleField();
+    }
+
+    /**
+     * @return array|null
+     */
+    public function renderSelectMultipleField(): ?array
+    {
+        $this->clearErrors();
+
+        $result = $this->handleSelectField();
+
+        if ($result === true && $this->selectedOptions !== []) {
+            return $this->selectedOptions;
+        }
+
+        return $this->getDefault() ?? [];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function renderSelectSingleField(): ?string
+    {
+        $this->clearErrors();
+
+        $result = $this->handleSelectField();
+
+        $defaultValue = $this->getDefault() ?? '';
+
+        return $result === true ? $this->getCurrentOption() : $defaultValue;
+    }
+
+    /**
+     * @return bool
+     */
+    private function handleSelectField(): bool
+    {
+        $prompt = $this->buildPrompt();
+        $header = $prompt . PHP_EOL;
+
+        if ($this->getDescription() !== null) {
+            $header .= $this->getDescription() . PHP_EOL;
+        }
+
+        $this->terminal->specialMode();
+        $this->terminal->write($header, 'cyan');
+        $this->terminal->write($this->parseInput(''));
+
+        $result = $this->handleSelectKeyboardInput($header);
+
+        $this->terminal->normalMode();
+        return $result;
+    }
+
+    /**
+     * @param string $header
+     * @return bool
+     */
+    private function handleSelectKeyboardInput(string $header): bool
+    {
+        while (true) {
+            $char = $this->terminal->readChar();
+
+            if ($char === PHP_EOL) { // Enter key
+                return true;
+            }
+
+            if ($char === "\033") {
+                $this->handleArrowKey($header);
+                continue;
+            }
+
+            if ($char === ' ') {
+                $this->terminal->clear();
+                $this->terminal->write($header, 'cyan');
+                $this->terminal->write($this->parseInput('space'));
+            }
+
+            if ($char === 'a') {
+                $this->terminal->clear();
+                $this->terminal->write($header, 'cyan');
+                $this->terminal->write($this->parseInput('a'));
+            }
+        }
+    }
+
+    /**
+     * @param string $header
+     * @return void
+     */
+    private function handleArrowKey(string $header): void
+    {
+        $sequence = $this->terminal->readChar() . $this->terminal->readChar();
+
+        if ($sequence === "[A") { // Up arrow
+            $this->terminal->clear();
+            $this->terminal->write($header, 'cyan');
+            $this->terminal->write($this->parseInput('up'));
+        } elseif ($sequence === "[B") { // Down arrow
+            $this->terminal->clear();
+            $this->terminal->write($header, 'cyan');
+            $this->terminal->write($this->parseInput('down'));
+        }
+    }
+
+    /**
      * @param string|int|float|array<int|string, string>|null $value
      * @return array<string>
      */
@@ -131,20 +254,22 @@ class SelectField extends AbstractField
     }
 
     /**
-     * @return array<int, string>
-     */
-    public function getSelectedOptions(): array
-    {
-        return $this->selectedOptions;
-    }
-
-    /**
      * @return int|string
      */
     public function getCurrentOption(): int|string
     {
         $options = array_keys($this->options);
         return $options[$this->cursorPosition] ?? '';
+    }
+
+    /**
+     * @return string
+     */
+    private function buildPrompt(): string
+    {
+        $label = $this->getLabel();
+        $required = $this->isRequired() ? ' (required)' : '';
+        return "$label$required: ";
     }
 
     /**

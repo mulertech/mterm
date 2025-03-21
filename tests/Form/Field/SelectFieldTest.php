@@ -2,9 +2,11 @@
 
 namespace MulerTech\MTerm\Tests\Form\Field;
 
+use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\SelectField;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use RuntimeException;
 
 class SelectFieldTest extends TestCase
 {
@@ -12,7 +14,9 @@ class SelectFieldTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->terminal = $this->createMock(Terminal::class);
         $this->field = new SelectField('select', 'Select Field');
+        $this->field->setTerminal($this->terminal);
     }
 
     public function testSetOptions(): void
@@ -67,72 +71,6 @@ class SelectFieldTest extends TestCase
         $this->assertStringContainsString('Invalid option: \'invalid\'', $errors[0]);
     }
 
-    public function testProcessInputSingleSelection(): void
-    {
-        $this->field->setOptions([
-            'opt1' => 'Option 1',
-            'opt2' => 'Option 2',
-            'opt3' => 'Option 3'
-        ]);
-
-        // Initially selected option should be first one
-        $this->assertEquals('opt1', $this->field->getCurrentOption());
-
-        // Move cursor down
-        $this->field->processInput('down');
-        $this->assertEquals('opt2', $this->field->getCurrentOption());
-
-        // Move cursor down again
-        $this->field->processInput('down');
-        $this->assertEquals('opt3', $this->field->getCurrentOption());
-
-        // Move cursor down beyond limit (should stay at last option)
-        $this->field->processInput('down');
-        $this->assertEquals('opt3', $this->field->getCurrentOption());
-
-        // Move cursor up
-        $this->field->processInput('up');
-        $this->assertEquals('opt2', $this->field->getCurrentOption());
-
-        // Move cursor up beyond limit (should stay at first option)
-        $this->field->processInput('up');
-        $this->field->processInput('up');
-        $this->assertEquals('opt1', $this->field->getCurrentOption());
-    }
-
-    public function testProcessInputMultipleSelection(): void
-    {
-        $this->field->setOptions([
-            'opt1' => 'Option 1',
-            'opt2' => 'Option 2',
-            'opt3' => 'Option 3'
-        ]);
-        $this->field->setMultipleSelection();
-
-        // Initially no options selected
-        $this->assertEmpty($this->field->getSelectedOptions());
-
-        // Select first option
-        $this->field->processInput('space');
-        $this->assertCount(1, $this->field->getSelectedOptions());
-        $this->assertArrayHasKey('opt1', $this->field->getSelectedOptions());
-
-        // Move down and select second option
-        $this->field->processInput('down');
-        $this->field->processInput('space');
-        $this->assertCount(2, $this->field->getSelectedOptions());
-        $this->assertArrayHasKey('opt2', $this->field->getSelectedOptions());
-
-        // Deselect second option
-        $this->field->processInput('space');
-        $this->assertCount(1, $this->field->getSelectedOptions());
-        $this->assertArrayNotHasKey('opt2', $this->field->getSelectedOptions());
-
-        // Select all
-        $this->field->processInput('a');
-        $this->assertCount(3, $this->field->getSelectedOptions());
-    }
-
     public function testValidateWithEmptyValue(): void
     {
         $this->field->setOptions([
@@ -150,4 +88,13 @@ class SelectFieldTest extends TestCase
         $this->assertNotEmpty($errors);
         $this->assertStringContainsString('required', $errors[0]);
     }
+
+    public function testProcessInputWithoutTerminalSet(): void
+    {
+        $field = new SelectField('password', 'Password');
+        $field->setDefault('secret');
+        self::expectException(RuntimeException::class);
+        $field->processInput();
+    }
+
 }

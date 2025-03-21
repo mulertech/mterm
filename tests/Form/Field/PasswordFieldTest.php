@@ -2,16 +2,25 @@
 
 namespace MulerTech\MTerm\Tests\Form\Field;
 
+use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\PasswordField;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PasswordFieldTest extends TestCase
 {
     private PasswordField $field;
+    private Terminal $terminal;
 
+    /**
+     * @throws Exception
+     */
     protected function setUp(): void
     {
+        $this->terminal = $this->createMock(Terminal::class);
         $this->field = new PasswordField('password', 'Password');
+        $this->field->setTerminal($this->terminal);
     }
 
     public function testDefaultValues(): void
@@ -39,22 +48,55 @@ class PasswordFieldTest extends TestCase
         $this->assertEquals('•', $this->field->getMaskChar());
     }
 
+    public function testProcessInputWithoutMaskInput(): void
+    {
+        $this->field->setMaskInput(false)->setDefault('secret');
+        $result = $this->field->processInput('');
+        $this->assertEquals('secret', $result);
+    }
+
+    public function testProcessInputWithoutTerminalSet(): void
+    {
+        $field = new PasswordField('password', 'Password');
+        $field->setDefault('secret');
+        self::expectException(RuntimeException::class);
+        $field->processInput();
+    }
+
     public function testProcessInputWithNonEmptyValue(): void
     {
-        $result = $this->field->processInput('mysecretpassword');
-        $this->assertEquals('mysecretpassword', $result);
+        $this->terminal
+            ->method('write')
+            ->withAnyParameters();
+        $this->terminal->expects($this->once())->method('specialMode');
+        $this->terminal
+            ->method('readChar')
+            // Simulate deleting c character
+            ->willReturnOnConsecutiveCalls('s', 'e', 'c', "\x7F", 'r', 'e', 't', "\n");
+        $this->terminal->expects($this->once())->method('writeLine');
+        $this->terminal->expects($this->once())->method('normalMode');
+        $result = $this->field->processInput('secret');
+        $this->assertEquals('seret', $result);
     }
 
     public function testProcessInputWithEmptyValue(): void
     {
+        $this->terminal
+            ->method('write')
+            ->withAnyParameters();
+        $this->terminal->expects($this->exactly(2))->method('specialMode');
+        $this->terminal
+            ->method('readChar')
+            ->willReturn("\n");
+        $this->terminal->expects($this->exactly(2))->method('writeLine');
+        $this->terminal->expects($this->exactly(2))->method('normalMode');
+
         // Test with no default value
         $result = $this->field->processInput('');
         $this->assertEquals('', $result);
-
-        // Test with default value
-        $this->field->setDefault('default_password');
+        $this->field->setDefault('default');
         $result = $this->field->processInput('');
-        $this->assertEquals('default_password', $result);
+        $this->assertEquals('default', $result);
     }
 
     public function testInheritedValidation(): void

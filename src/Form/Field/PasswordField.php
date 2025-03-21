@@ -2,6 +2,8 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+use MulerTech\MTerm\Core\Terminal;
+
 /**
  * Class PasswordField
  * @package MulerTech\MTerm
@@ -52,12 +54,72 @@ class PasswordField extends TextField
      * @param string $input
      * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|float|array
+    public function parseInput(string $input): string|int|float|array
     {
         if ($input === '' && !is_null($this->defaultValue)) {
             return $this->defaultValue;
         }
 
         return $input;
+    }
+
+    /**
+     * Process the password input with masking
+     *
+     * @return string|int|float|array<int|string, string>
+     */
+    public function processInput(string $input = ''): string|int|float|array
+    {
+        if (!$this->maskInput) {
+            return parent::processInput($input);
+        }
+
+        if ($this->terminal === null) {
+            throw new \RuntimeException('Terminal must be set before calling processInput');
+        }
+
+        $this->clearErrors();
+
+        $prompt = $this->buildPrompt();
+
+        $this->terminal->write($prompt);
+        $this->terminal->specialMode();
+
+        $password = '';
+
+        while (true) {
+            $char = $this->terminal->readChar();
+
+            // Enter key pressed
+            if ($char === PHP_EOL) {
+                $this->terminal->writeLine('');
+                break;
+            }
+
+            // Backspace handling
+            if ($char === "\x7F" || $char === "\x08") {
+                if (strlen($password) > 0) {
+                    $password = substr($password, 0, -1);
+                    $this->terminal->write("\x08 \x08");
+                }
+            } // Regular character
+            elseif (ord($char) >= 32) {
+                $password .= $char;
+                $this->terminal->write($this->getMaskChar());
+            }
+        }
+
+        $this->terminal->normalMode();
+        return $this->parseInput($password);
+    }
+
+    /**
+     * @return string
+     */
+    private function buildPrompt(): string
+    {
+        $label = $this->getLabel();
+        $required = $this->isRequired() ? ' (required)' : '';
+        return "$label$required: ";
     }
 }

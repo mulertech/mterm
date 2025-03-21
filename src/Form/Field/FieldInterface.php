@@ -2,6 +2,8 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+use MulerTech\MTerm\Core\Terminal;
+
 /**
  * Interface FieldInterface
  * @package MulerTech\MTerm
@@ -50,11 +52,6 @@ interface FieldInterface
     public function setRequired(bool $required = true): self;
 
     /**
-     * @return array<string>
-     */
-    public function getErrors(): array;
-
-    /**
      * @return void
      */
     public function clearErrors(): void;
@@ -71,11 +68,6 @@ interface FieldInterface
     public function getDefault(): string|int|float|array|null;
 
     /**
-     * @return bool
-     */
-    public function isMultipleInput(): bool;
-
-    /**
      * Process user input
      *
      * @param string $input Raw input from user
@@ -90,4 +82,12 @@ interface FieldInterface
      * @return array<string> List of error messages (empty if valid)
      */
     public function validate(string|int|float|array|null $value): array;
+
+    /**
+     * Set terminal instance to be used for input/output operations
+     *
+     * @param Terminal $terminal
+     * @return self
+     */
+    public function setTerminal(Terminal $terminal): self;
 }

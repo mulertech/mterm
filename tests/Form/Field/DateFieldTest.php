@@ -58,4 +58,10 @@ class DateFieldTest extends TestCase
         $this->assertEmpty($this->field->validate('15/01/2023'));
         $this->assertNotEmpty($this->field->validate('2023-01-15'));
     }
+
+    public function testValidateWithEmptyValue(): void
+    {
+        $this->field->setRequired();
+        $this->assertNotEmpty($this->field->validate(''));
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Tests\Form\Field;
 
+use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\RadioField;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -13,7 +14,9 @@ class RadioFieldTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->terminal = $this->createMock(Terminal::class);
         $this->field = new RadioField('choice', 'Choose option');
+        $this->field->setTerminal($this->terminal);
     }
 
     public function testInstanceCreation(): void
@@ -36,10 +39,6 @@ class RadioFieldTest extends TestCase
 
         $result = $this->field->setDefault('opt2');
         $this->assertSame($this->field, $result);
-
-        // Test default value is used when input is empty
-        $value = $this->field->processInput('');
-        $this->assertEquals('o  Option 1' . PHP_EOL . '   Option 2' . PHP_EOL, $value);
     }
 
     public function testCursorCharacterIsSet(): void
