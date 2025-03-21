@@ -47,15 +47,4 @@ abstract class AbstractCommand implements CommandInterface
     {
         $this->terminal->writeLine($this->getName() . ": " . $this->getDescription(), "cyan");
     }
-
-    /**
-     * Validate command arguments
-     *
-     * @param array $args Arguments to validate
-     * @return bool True if arguments are valid
-     */
-    protected function validateArgs(array $args): bool
-    {
-        return true;
-    }
 }

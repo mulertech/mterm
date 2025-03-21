@@ -2,10 +2,12 @@
 
 namespace MulerTech\MTerm\Tests\Utils;
 
-use MulerTech\MTerm\Utils\ColorOutput;
+use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Utils\TableFormatter;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionException;
 
 class TableFormatterTest extends TestCase
 {
@@ -14,19 +16,16 @@ class TableFormatterTest extends TestCase
      */
     public function testRenderTable(): void
     {
-        $mockOutput = $this->createMock(ColorOutput::class);
+        $mockTerminal = $this->createMock(Terminal::class);
 
         // Expected sequence of calls to the mock
-        $mockOutput->expects($this->exactly(3))
-            ->method('writeLineColored');
-
-        $mockOutput->expects($this->exactly(24))
-            ->method('writeColored');
-
-        $mockOutput->expects($this->exactly(3))
+        $mockTerminal->expects($this->exactly(6))
             ->method('writeLine');
 
-        $tableFormatter = new TableFormatter($mockOutput);
+        $mockTerminal->expects($this->exactly(24))
+            ->method('write');
+
+        $tableFormatter = new TableFormatter($mockTerminal);
 
         $headers = ['ID', 'Name', 'Email'];
         $rows = [
@@ -38,15 +37,15 @@ class TableFormatterTest extends TestCase
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      * @throws Exception
      */
     public function testCalculateColumnWidths(): void
     {
-        $mockOutput = $this->createMock(ColorOutput::class);
-        $tableFormatter = new TableFormatter($mockOutput);
+        $mockTerminal = $this->createMock(Terminal::class);
+        $tableFormatter = new TableFormatter($mockTerminal);
 
-        $reflection = new \ReflectionClass($tableFormatter);
+        $reflection = new ReflectionClass($tableFormatter);
         $method = $reflection->getMethod('calculateColumnWidths');
 
         $headers = ['ID', 'Name', 'Email'];

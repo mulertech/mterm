@@ -33,22 +33,26 @@ class TextField extends AbstractField
     }
 
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value !== null && $value !== '') {
+        if ($value === '') {
+            return $errors;
+        }
+
+        if (is_string($value)) {
             $length = mb_strlen($value);
 
             if ($length < $this->minLength) {
-                $errors[] = "This field must be at least {$this->minLength} characters long.";
+                $errors[] = "This field must be at least $this->minLength characters long.";
             }
 
             if ($this->maxLength !== null && $length > $this->maxLength) {
-                $errors[] = "This field cannot exceed {$this->maxLength} characters.";
+                $errors[] = "This field cannot exceed $this->maxLength characters.";
             }
         }
 

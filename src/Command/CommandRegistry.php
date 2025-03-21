@@ -64,16 +64,18 @@ class CommandRegistry
      * Execute a command by name with arguments
      *
      * @param string $name Command name
-     * @param array $args Command arguments
+     * @param array<int, mixed> $args Command arguments
      * @return int Exit code
      * @throws InvalidArgumentException When command doesn't exist
      */
     public function execute(string $name, array $args = []): int
     {
-        if (!$this->has($name)) {
+        $command = $this->get($name);
+
+        if ($command === null) {
             throw new InvalidArgumentException("Command '{$name}' not found");
         }
 
-        return $this->get($name)->execute($args);
+        return $command->execute($args);
     }
 }

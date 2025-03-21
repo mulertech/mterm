@@ -27,11 +27,11 @@ class LengthValidator extends AbstractValidator
 
         if ($errorMessage === null) {
             if ($min !== null && $max !== null) {
-                $errorMessage = "Value must be between {$min} and {$max} characters.";
+                $errorMessage = "Value must be between $min and $max characters.";
             } elseif ($min !== null) {
-                $errorMessage = "Value must be at least {$min} characters.";
+                $errorMessage = "Value must be at least $min characters.";
             } elseif ($max !== null) {
-                $errorMessage = "Value cannot exceed {$max} characters.";
+                $errorMessage = "Value cannot exceed $max characters.";
             } else {
                 $errorMessage = "Invalid length.";
             }

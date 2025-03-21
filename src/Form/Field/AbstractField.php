@@ -14,11 +14,20 @@ abstract class AbstractField implements FieldInterface
     protected string $name;
     protected string $label;
     protected ?string $description = null;
+    /**
+     * @var array<string>
+     */
+    protected array $errors = [];
     protected bool $required = false;
-    protected ?string $defaultValue = null;
+    /**
+     * @var string|int|float|array<string>|null
+     */
+    protected string|int|float|array|null $defaultValue = null;
+    /**
+     * @var array<ValidatorInterface>
+     */
     protected array $validators = [];
     protected bool $multipleInput = false;
-    protected bool $multipleSelection = false;
 
     /**
      * @param string $name
@@ -83,31 +92,37 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @return string|null
+     * @return string|int|float|array<string>|null
      */
-    public function getDefault(): ?string
+    public function getDefault(): string|int|float|array|null
     {
         return $this->defaultValue;
     }
 
     /**
-     * @param string $defaultValue
+     * @param string|int|float|array<string> $defaultValue
      * @return $this
      */
-    public function setDefault(string $defaultValue): self
+    public function setDefault(string|int|float|array $defaultValue): self
     {
         $this->defaultValue = $defaultValue;
         return $this;
     }
 
     /**
-     * @param bool $multipleInput
-     * @return $this
+     * @return array<string>
      */
-    protected function setMultipleInput(bool $multipleInput): self
+    public function getErrors(): array
     {
-        $this->multipleInput = $multipleInput;
-        return $this;
+        return $this->errors;
+    }
+
+    /**
+     * @return void
+     */
+    public function clearErrors(): void
+    {
+        $this->errors = [];
     }
 
     /**
@@ -116,14 +131,6 @@ abstract class AbstractField implements FieldInterface
     public function isMultipleInput(): bool
     {
         return $this->multipleInput;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isMultipleSelection(): bool
-    {
-        return $this->multipleSelection;
     }
 
     /**
@@ -137,36 +144,42 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
-        $errors = [];
-
         // Check required constraint
-        if ($this->required && ($value === null || $value === '')) {
-            $errors[] = "This field is required.";
-            return $errors;
+        if ($this->required && ($value === null || $value === '' || $value === [])) {
+            $this->errors[] = "This field is required.";
+            return $this->errors;
         }
 
         // Run all validators
         foreach ($this->validators as $validator) {
             $error = $validator->validate($value);
             if ($error !== null) {
-                $errors[] = $error;
+                $this->errors[] = $error;
             }
         }
 
-        return $errors;
+        return $this->errors;
     }
 
     /**
      * @param string $input
-     * @return string|int|null|float
+     * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|null|float
+    public function processInput(string $input): string|int|float|array
     {
-        return $input === '' ? $this->defaultValue : $input;
+        if ($input !== '') {
+            return $input;
+        }
+
+        if ($this->defaultValue !== null && !is_array($this->defaultValue)) {
+            return $this->defaultValue;
+        }
+
+        return '';
     }
 }

@@ -41,16 +41,20 @@ class RangeField extends NumberField
     }
 
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value !== null && $value !== '') {
-            if ($this->step > 1 && ($value % $this->step) !== 0) {
-                $errors[] = "Value must be a multiple of {$this->step}.";
+        if ($value === '') {
+            return $errors;
+        }
+
+        if (is_numeric($value)) {
+            if ($this->step > 1 && ((int)$value % $this->step) !== 0) {
+                $errors[] = "Value must be a multiple of $this->step.";
             }
         }
 

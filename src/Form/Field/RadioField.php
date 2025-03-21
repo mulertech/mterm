@@ -18,4 +18,14 @@ class RadioField extends SelectField
         parent::__construct($name, $label);
         $this->cursorPresent = 'o';
     }
+
+    /**
+     * @param bool $multipleSelection
+     * @return $this
+     */
+    public function setMultipleSelection(bool $multipleSelection = true): self
+    {
+        // Radio fields can't have multiple selection
+        return $this;
+    }
 }

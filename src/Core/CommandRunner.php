@@ -10,10 +10,10 @@ namespace MulerTech\MTerm\Core;
 class CommandRunner
 {
     /**
-     * Exécute une commande système et retourne le résultat
+     * Execute a command and capture the output and return code
      *
-     * @param string $command La commande à exécuter
-     * @return array Tableau contenant [output, returnCode]
+     * @param string $command
+     * @return array{output: array<int, string>, returnCode: int}
      */
     public function run(string $command): array
     {
@@ -29,38 +29,33 @@ class CommandRunner
     }
 
     /**
-     * Exécute une commande et capture les flux stdout et stderr séparément
-     *
-     * @param string $command La commande à exécuter
-     * @return array Tableau contenant [stdout, stderr, returnCode]
+     * @param string $command
+     * @return array{stdout: false|string, stderr: false|string, returnCode: int}
      */
     public function runWithStderr(string $command): array
     {
-        $descriptorspec = [
+        $descriptorSpec = [
             0 => ['pipe', 'r'],  // stdin
             1 => ['pipe', 'w'],  // stdout
             2 => ['pipe', 'w']   // stderr
         ];
 
-        $process = proc_open($command, $descriptorspec, $pipes);
+        $pipes = [];
+        $process = proc_open($command, $descriptorSpec, $pipes);
 
-        if (is_resource($process)) {
-            $stdout = stream_get_contents($pipes[1]);
-            $stderr = stream_get_contents($pipes[2]);
+        $stdout = stream_get_contents($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
 
-            fclose($pipes[0]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
+        fclose($pipes[0]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
 
-            $returnCode = proc_close($process);
+        $returnCode = $process ? proc_close($process) : -1;
 
-            return [
-                'stdout' => $stdout,
-                'stderr' => $stderr,
-                'returnCode' => $returnCode
-            ];
-        }
-
-        throw new \RuntimeException('Failed to execute command: ' . $command);
+        return [
+            'stdout' => $stdout,
+            'stderr' => $stderr,
+            'returnCode' => $returnCode
+        ];
     }
 }

@@ -14,7 +14,7 @@ class SelectSingleArrowTemplate extends SelectField
     public function __construct(string $name, string $label, bool $selectMultiple = false)
     {
         parent::__construct($name, $label, $selectMultiple);
-        $this->setDescription('↑/↓: Navigation | ENTER: Selection | q: Quit');
+        $this->setDescription('↑/↓: Navigation | ENTER: Selection');
         $this->cursorPresent = '>';
     }
 }

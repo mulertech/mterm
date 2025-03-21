@@ -2,6 +2,8 @@
 
 namespace MulerTech\MTerm\Utils;
 
+use MulerTech\MTerm\Core\Terminal;
+
 /**
  * Class TableFormatter
  * @package MulerTech\MTerm
@@ -9,27 +11,27 @@ namespace MulerTech\MTerm\Utils;
  */
 class TableFormatter
 {
-    private ColorOutput $output;
+    private Terminal $terminal;
     private string $headerColor;
     private string $borderColor;
     private string $cellColor;
     private int $padding;
 
     /**
-     * @param ColorOutput $output
+     * @param Terminal $terminal
      * @param string $headerColor
      * @param string $borderColor
      * @param string $cellColor
      * @param int $padding
      */
     public function __construct(
-        ColorOutput $output,
-        string $headerColor = ColorOutput::GREEN,
-        string $borderColor = ColorOutput::BLUE,
-        string $cellColor = ColorOutput::WHITE,
+        Terminal $terminal,
+        string $headerColor = Terminal::COLORS['green'],
+        string $borderColor = Terminal::COLORS['blue'],
+        string $cellColor = Terminal::COLORS['white'],
         int $padding = 1
     ) {
-        $this->output = $output;
+        $this->terminal = $terminal;
         $this->headerColor = $headerColor;
         $this->borderColor = $borderColor;
         $this->cellColor = $cellColor;
@@ -37,7 +39,7 @@ class TableFormatter
     }
 
     /**
-     * Format and output a table
+     * Format and terminal a table
      *
      * @param array $headers Table headers
      * @param array $rows Table data rows
@@ -79,7 +81,7 @@ class TableFormatter
         }
 
         // Add padding
-        return array_map(fn($width) => $width + ($this->padding * 2), $widths);
+        return array_map(fn ($width) => $width + ($this->padding * 2), $widths);
     }
 
     /**
@@ -94,7 +96,7 @@ class TableFormatter
         foreach ($columnWidths as $width) {
             $line .= str_repeat('-', $width) . '+';
         }
-        $this->output->writeLineColored($line, $this->borderColor);
+        $this->terminal->writeLine($line, $this->borderColor);
     }
 
     /**
@@ -118,18 +120,18 @@ class TableFormatter
             $i++;
         }
 
-        $this->output->writeColored('|', $this->borderColor);
+        $this->terminal->write('|', $this->borderColor);
 
         $parts = explode('|', $line);
         array_shift($parts); // Remove first empty element
 
         foreach ($parts as $i => $part) {
             if ($i > 0) {
-                $this->output->writeColored('|', $this->borderColor);
+                $this->terminal->write('|', $this->borderColor);
             }
-            $this->output->writeColored($part, $color, $bold);
+            $this->terminal->write($part, $color, $bold);
         }
 
-        $this->output->writeLine('');
+        $this->terminal->writeLine('');
     }
 }

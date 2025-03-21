@@ -9,11 +9,12 @@ namespace MulerTech\MTerm\Form\Field;
  */
 class FileField extends AbstractField
 {
+    /** @var array<string> */
     private array $allowedExtensions = [];
     private ?int $maxSize = null;
 
     /**
-     * @param array $extensions
+     * @param array<string> $extensions
      * @return $this
      */
     public function setAllowedExtensions(array $extensions): self
@@ -34,11 +35,11 @@ class FileField extends AbstractField
 
     /**
      * @param string $input
-     * @return string|int|null|float
+     * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|null|float
+    public function processInput(string $input): string|int|float|array
     {
-        if ($input === '') {
+        if ($input === '' && !is_null($this->defaultValue)) {
             return $this->defaultValue;
         }
 
@@ -46,16 +47,20 @@ class FileField extends AbstractField
     }
 
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value !== null && $value !== '') {
+        if ($value === '') {
+            return $errors;
+        }
+
+        if (is_string($value)) {
             if (!file_exists($value)) {
-                $errors[] = "File not found: {$value}";
+                $errors[] = "File not found: $value";
                 return $errors;
             }
 
@@ -63,7 +68,7 @@ class FileField extends AbstractField
                 $extension = strtolower(pathinfo($value, PATHINFO_EXTENSION));
                 if (!in_array($extension, $this->allowedExtensions, true)) {
                     $allowed = implode(', ', $this->allowedExtensions);
-                    $errors[] = "File type not allowed. Allowed types: {$allowed}";
+                    $errors[] = "File type not allowed. Allowed types: $allowed";
                 }
             }
 
@@ -71,7 +76,7 @@ class FileField extends AbstractField
                 $fileSize = filesize($value);
                 if ($fileSize > $this->maxSize) {
                     $maxSizeMb = number_format($this->maxSize / 1048576, 2);
-                    $errors[] = "File is too large. Maximum size is {$maxSizeMb} MB.";
+                    $errors[] = "File is too large. Maximum size is $maxSizeMb MB.";
                 }
             }
         }

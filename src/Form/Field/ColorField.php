@@ -10,14 +10,18 @@ namespace MulerTech\MTerm\Form\Field;
 class ColorField extends TextField
 {
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value !== null && $value !== '') {
+        if ($value === '') {
+            return $errors;
+        }
+
+        if (is_string($value)) {
             // Validate hexadecimal color format (#RRGGBB or #RGB)
             if (!preg_match('/^#([A-Fa-f0-9]{3}){1,2}$/', $value)) {
                 $errors[] = "Please enter a valid color in hexadecimal format (#RGB or #RRGGBB).";

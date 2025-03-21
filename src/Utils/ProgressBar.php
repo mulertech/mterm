@@ -2,6 +2,8 @@
 
 namespace MulerTech\MTerm\Utils;
 
+use MulerTech\MTerm\Core\Terminal;
+
 /**
  * Class ProgressBar
  * @package MulerTech\MTerm
@@ -9,7 +11,7 @@ namespace MulerTech\MTerm\Utils;
  */
 class ProgressBar
 {
-    private ColorOutput $output;
+    private Terminal $terminal;
     private int $total;
     private int $current;
     private int $width;
@@ -19,7 +21,7 @@ class ProgressBar
     private ?float $startTime = null;
 
     /**
-     * @param ColorOutput $output
+     * @param Terminal $terminal
      * @param int $total
      * @param int $width
      * @param string $completeChar
@@ -27,14 +29,14 @@ class ProgressBar
      * @param string $color
      */
     public function __construct(
-        ColorOutput $output,
+        Terminal $terminal,
         int $total = 100,
         int $width = 50,
         string $completeChar = '=',
         string $incompleteChar = '-',
-        string $color = ColorOutput::GREEN
+        string $color = Terminal::COLORS['green']
     ) {
-        $this->output = $output;
+        $this->terminal = $terminal;
         $this->total = $total;
         $this->width = $width;
         $this->completeChar = $completeChar;
@@ -91,7 +93,7 @@ class ProgressBar
     {
         $this->current = $this->total;
         $this->draw();
-        $this->output->writeLine('');
+        $this->terminal->writeLine('');
     }
 
     /**
@@ -115,6 +117,6 @@ class ProgressBar
 
         $line = sprintf("\r[%s] %3d%%%s", $bar, $percent, $timeInfo);
 
-        $this->output->writeColored($line, $this->color);
+        $this->terminal->write($line, $this->color);
     }
 }

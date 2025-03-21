@@ -9,7 +9,7 @@ namespace MulerTech\MTerm\Core;
  */
 class Terminal
 {
-    private const COLORS = [
+    public const COLORS = [
         'black' => '0;30',
         'red' => '0;31',
         'green' => '0;32',
@@ -18,6 +18,14 @@ class Terminal
         'magenta' => '0;35',
         'cyan' => '0;36',
         'white' => '0;37',
+        'bold_black' => '1;30',
+        'bold_red' => '1;31',
+        'bold_green' => '1;32',
+        'bold_yellow' => '1;33',
+        'bold_blue' => '1;34',
+        'bold_magenta' => '1;35',
+        'bold_cyan' => '1;36',
+        'bold_white' => '1;37',
     ];
 
     /**
@@ -30,7 +38,11 @@ class Terminal
             $this->write($prompt);
         }
 
-        return trim(fgets(STDIN));
+        $resource = $this->inputStream();
+
+        $line = $resource ? fgets($resource) : false;
+
+        return $line ? trim($line) : '';
     }
 
     /**
@@ -43,31 +55,41 @@ class Terminal
             $this->write($prompt);
         }
 
-        return fgetc(STDIN);
+        $resource = $this->inputStream();
+
+        $char = $resource ? fgetc($resource) : '';
+
+        return $char === false ? '' : $char;
     }
 
     /**
      * @param string $text
      * @param string|null $color
+     * @param bool $bold Whether to make text bold
      * @return void
      */
-    public function write(string $text, string $color = null): void
+    public function write(string $text, string $color = null, bool $bold = false): void
     {
-        if ($color !== null && isset(self::COLORS[$color]) && $this->supportsAnsi()) {
-            echo "\033[" . self::COLORS[$color] . "m" . $text . "\033[0m";
-        } else {
-            echo $text;
+        if ($color !== null && $this->supportsAnsi()) {
+            $colorKey = $bold ? "bold_{$color}" : $color;
+            if (isset(self::COLORS[$colorKey])) {
+                echo "\033[" . self::COLORS[$colorKey] . "m" . $text . "\033[0m";
+                return;
+            }
         }
+
+        echo $text;
     }
 
     /**
      * @param string $text
      * @param string|null $color
+     * @param bool $bold Whether to make text bold
      * @return void
      */
-    public function writeLine(string $text, string $color = null): void
+    public function writeLine(string $text, string $color = null, bool $bold = false): void
     {
-        $this->write($text . PHP_EOL, $color);
+        $this->write($text . PHP_EOL, $color, $bold);
     }
 
     /**
@@ -75,11 +97,7 @@ class Terminal
      */
     public function clear(): void
     {
-        if (DIRECTORY_SEPARATOR === '/') {
-            system('clear');
-        } else {
-            system('cls');
-        }
+        $this->system(DIRECTORY_SEPARATOR === '/' ? 'clear' : 'cls');
     }
 
     /**
@@ -87,7 +105,7 @@ class Terminal
      */
     public function specialMode(): void
     {
-        system('stty -icanon -echo');
+        $this->system('stty -icanon -echo');
     }
 
     /**
@@ -95,16 +113,29 @@ class Terminal
      */
     public function normalMode(): void
     {
-        system('stty icanon echo');
+        $this->system('stty icanon echo');
+    }
+
+    public function system(string $command): void
+    {
+        system($command);
     }
 
     /**
      * @return bool
      */
-    private function supportsAnsi(): bool
+    public function supportsAnsi(): bool
     {
         return DIRECTORY_SEPARATOR === '/' ||
             (function_exists('sapi_windows_vt100_support') &&
             @sapi_windows_vt100_support(STDOUT));
+    }
+
+    /**
+     * @return false|resource
+     */
+    public function inputStream()
+    {
+        return STDIN;
     }
 }

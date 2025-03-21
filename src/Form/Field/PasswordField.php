@@ -50,13 +50,14 @@ class PasswordField extends TextField
 
     /**
      * @param string $input
-     * @return string|int|float|null
+     * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|null|float
+    public function processInput(string $input): string|int|float|array
     {
-        if ($input === '') {
+        if ($input === '' && !is_null($this->defaultValue)) {
             return $this->defaultValue;
         }
+
         return $input;
     }
 }

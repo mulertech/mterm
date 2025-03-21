@@ -33,11 +33,11 @@ class DateField extends TextField
 
     /**
      * @param string $input
-     * @return string|int|null|float
+     * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|null|float
+    public function processInput(string $input): string|int|float|array
     {
-        if ($input === '') {
+        if ($input === '' && !is_null($this->defaultValue) && !is_array($this->defaultValue)) {
             return $this->defaultValue;
         }
 
@@ -50,20 +50,24 @@ class DateField extends TextField
     }
 
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value !== null && $value !== '') {
+        if ($value === '') {
+            return $errors;
+        }
+
+        if (is_string($value)) {
             $date = DateTime::createFromFormat($this->format, $value);
 
             $dateErrors = DateTime::getLastErrors();
 
-            if ($date === false || $dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0) {
-                $errors[] = "Please enter a valid date in {$this->format} format.";
+            if ($date === false || ($dateErrors !== false && $dateErrors['warning_count'] > 0)) {
+                $errors[] = "Please enter a valid date in $this->format format.";
             }
         }
 

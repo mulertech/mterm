@@ -33,7 +33,7 @@ class DateValidator extends AbstractValidator
         $this->maxDate = $maxDate;
 
         if ($errorMessage === null) {
-            $errorMessage = "Please enter a valid date in {$format} format.";
+            $errorMessage = "Please enter a valid date in $format format.";
         }
 
         parent::__construct($errorMessage);
@@ -56,7 +56,7 @@ class DateValidator extends AbstractValidator
 
         // Check if the format is exactly as expected (no additional characters)
         $errors = DateTime::getLastErrors();
-        if ($errors['warning_count'] > 0 || $errors['error_count'] > 0) {
+        if ($errors !== false && $errors['warning_count'] > 0) {
             return $this->errorMessage;
         }
 

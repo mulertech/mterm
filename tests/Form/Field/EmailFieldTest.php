@@ -34,7 +34,7 @@ class EmailFieldTest extends TestCase
 
     public function testEmptyValueFailsValidationForRequiredField(): void
     {
-        $this->field->setRequired(true);
+        $this->field->setRequired();
         $this->assertNotEmpty($this->field->validate(''));
     }
 

@@ -10,14 +10,18 @@ namespace MulerTech\MTerm\Form\Field;
 class UrlField extends TextField
 {
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value !== null && $value !== '' && !filter_var($value, FILTER_VALIDATE_URL)) {
+        if ($value === '') {
+            return $errors;
+        }
+
+        if (is_string($value) && !filter_var($value, FILTER_VALIDATE_URL)) {
             $errors[] = "Please enter a valid URL.";
         }
 

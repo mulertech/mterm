@@ -13,6 +13,7 @@ class SelectField extends AbstractField
      * @var array<int, string> $options
      */
     protected array $options = [];
+    protected bool $multipleSelection = false;
     protected string $checkboxUnchecked = '[ ]';
     protected string $checkboxChecked = '[X]';
     protected string $cursorAbsent = ' ';
@@ -46,10 +47,28 @@ class SelectField extends AbstractField
     }
 
     /**
-     * @param string $input
-     * @return string|int|float|null
+     * @param bool $multipleSelection
+     * @return $this
      */
-    public function processInput(string $input): string|int|null|float
+    public function setMultipleSelection(bool $multipleSelection = true): self
+    {
+        $this->multipleSelection = $multipleSelection;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMultipleSelection(): bool
+    {
+        return $this->multipleSelection;
+    }
+
+    /**
+     * @param string $input
+     * @return string|int|float|array<int|string, string>
+     */
+    public function processInput(string $input): string|int|float|array
     {
         // Generate the selected options
         if ($this->multipleSelection) {
@@ -83,32 +102,32 @@ class SelectField extends AbstractField
     }
 
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
-        $errors = parent::validate($value);
+        $this->errors = parent::validate($value);
 
-        if ($value === null || $value === '') {
-            return $errors;
+        if (empty($value) || is_numeric($value)) {
+            return $this->errors;
         }
 
-        if ($this->multipleSelection) {
-            foreach (explode(',', $value) as $val) {
-                if (!array_key_exists($val, $this->options)) {
-                    $errors[] = "Invalid option: '$val'.";
+        if ($this->multipleSelection && is_array($value)) {
+            foreach ($value as $key => $val) {
+                if (!array_key_exists($key, $this->options)) {
+                    $this->errors[] = "Invalid option: '$key'.";
                 }
             }
 
-            return $errors;
+            return $this->errors;
         }
 
-        if (!array_key_exists($value, $this->options)) {
-            $errors[] = "Invalid option: '$value'.";
+        if (!is_array($value) && !array_key_exists($value, $this->options)) {
+            $this->errors[] = "Invalid option: '$value'.";
         }
 
-        return $errors;
+        return $this->errors;
     }
 
     /**
@@ -117,16 +136,6 @@ class SelectField extends AbstractField
     public function getSelectedOptions(): array
     {
         return $this->selectedOptions;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPlainSelectedOptions(): string
-    {
-        $options = array_keys($this->options);
-        $selected = array_keys($this->selectedOptions);
-        return implode(',', array_intersect($options, $selected));
     }
 
     /**

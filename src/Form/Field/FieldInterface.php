@@ -50,15 +50,25 @@ interface FieldInterface
     public function setRequired(bool $required = true): self;
 
     /**
-     * @param string $defaultValue
-     * @return self
+     * @return array<string>
      */
-    public function setDefault(string $defaultValue): self;
+    public function getErrors(): array;
 
     /**
-     * @return string|null
+     * @return void
      */
-    public function getDefault(): ?string;
+    public function clearErrors(): void;
+
+    /**
+     * @param string|int|float|array<string> $defaultValue
+     * @return self
+     */
+    public function setDefault(string|int|float|array $defaultValue): self;
+
+    /**
+     * @return string|int|float|array<string>|null
+     */
+    public function getDefault(): string|int|float|array|null;
 
     /**
      * @return bool
@@ -66,23 +76,18 @@ interface FieldInterface
     public function isMultipleInput(): bool;
 
     /**
-     * @return bool
-     */
-    public function isMultipleSelection(): bool;
-
-    /**
      * Process user input
      *
      * @param string $input Raw input from user
-     * @return string|int|null|float Processed input value
+     * @return string|int|float|array<int|string, string> Processed input value
      */
-    public function processInput(string $input): string|int|null|float;
+    public function processInput(string $input): string|int|float|array;
 
     /**
      * Validate field value
      *
-     * @param string|null $value Field value to validate
-     * @return array List of error messages (empty if valid)
+     * @param string|int|float|array<int|string, string>|null $value Field value to validate
+     * @return array<string> List of error messages (empty if valid)
      */
-    public function validate(?string $value): array;
+    public function validate(string|int|float|array|null $value): array;
 }

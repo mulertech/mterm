@@ -4,6 +4,7 @@ namespace MulerTech\MTerm\Tests\Form\Field;
 
 use MulerTech\MTerm\Form\Field\TextField;
 use MulerTech\MTerm\Form\Validator\ValidatorInterface;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 class TextFieldTest extends TestCase
@@ -35,7 +36,7 @@ class TextFieldTest extends TestCase
     {
         $this->assertFalse($this->field->isRequired());
 
-        $this->field->setRequired(true);
+        $this->field->setRequired();
         $this->assertTrue($this->field->isRequired());
 
         $this->field->setRequired(false);
@@ -58,10 +59,12 @@ class TextFieldTest extends TestCase
 
     public function testValidateWithRequiredField(): void
     {
-        $this->field->setRequired(true);
+        $this->field->setRequired();
 
         $this->assertCount(1, $this->field->validate(''));
+        $this->field->clearErrors();
         $this->assertCount(1, $this->field->validate(null));
+        $this->field->clearErrors();
         $this->assertEmpty($this->field->validate('value'));
     }
 
@@ -81,6 +84,9 @@ class TextFieldTest extends TestCase
         $this->assertCount(1, $this->field->validate('123456'));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testCustomValidator(): void
     {
         $mockValidator = $this->createMock(ValidatorInterface::class);

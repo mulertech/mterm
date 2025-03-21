@@ -26,7 +26,7 @@ interface CommandInterface
     /**
      * Execute the command
      *
-     * @param array $args Command arguments
+     * @param array<int, mixed> $args Command arguments
      * @return int Exit code (0 for success, other values for errors)
      */
     public function execute(array $args = []): int;

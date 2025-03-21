@@ -34,11 +34,11 @@ class CheckboxField extends AbstractField
 
     /**
      * @param string $input
-     * @return string|int|null|float
+     * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|null|float
+    public function processInput(string $input): string|int|float|array
     {
-        if ($input === '') {
+        if ($input === '' && !is_null($this->defaultValue) && !is_array($this->defaultValue)) {
             return $this->defaultValue;
         }
 

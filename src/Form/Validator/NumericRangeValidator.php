@@ -27,11 +27,11 @@ class NumericRangeValidator extends AbstractValidator
 
         if ($errorMessage === null) {
             if ($min !== null && $max !== null) {
-                $errorMessage = "Value must be between {$min} and {$max}.";
+                $errorMessage = "Value must be between $min and $max.";
             } elseif ($min !== null) {
-                $errorMessage = "Value must be at least {$min}.";
+                $errorMessage = "Value must be at least $min.";
             } elseif ($max !== null) {
-                $errorMessage = "Value cannot exceed {$max}.";
+                $errorMessage = "Value cannot exceed $max.";
             } else {
                 $errorMessage = "Invalid number.";
             }

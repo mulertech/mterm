@@ -4,6 +4,7 @@ namespace MulerTech\MTerm\Form;
 
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\FieldInterface;
+use MulerTech\MTerm\Form\Field\SelectField;
 
 /**
  * Class Form
@@ -13,9 +14,14 @@ use MulerTech\MTerm\Form\Field\FieldInterface;
 class Form
 {
     private FormRenderer $renderer;
+    /**
+     * @var array<string, FieldInterface>
+     */
     private array $fields = [];
+    /**
+     * @var array<string, string|int|float|array<int|string, string>|null>
+     */
     private array $values = [];
-    private array $errors = [];
     private bool $isSubmitted = false;
     private bool $isValid = false;
 
@@ -42,35 +48,42 @@ class Form
     /**
      * Handle form submission
      *
-     * @return bool True if the form is valid
+     * @return void
      */
-    public function handle(): bool
+    public function handle(): void
     {
         $this->isSubmitted = true;
         $this->values = [];
-        $this->errors = [];
+        $this->renderer->clear();
 
         foreach ($this->fields as $field) {
-            $value = match (true) {
-                $field->isMultipleInput() && $field->isMultipleSelection() => $this->renderer->renderSelectMultipleField($field),
-                $field->isMultipleInput() && !$field->isMultipleSelection() => $this->renderer->renderSelectSingleField($field),
-                default => $this->renderer->renderField($field),
-            };
-            $this->values[$field->getName()] = $value;
-
-            $fieldErrors = $field->validate($value);
-            if (!empty($fieldErrors)) {
-                $this->errors[$field->getName()] = $fieldErrors;
-            }
+            $this->handleField($field);
         }
 
-        $this->isValid = empty($this->errors);
+        $this->isValid = true;
+    }
 
-        if (!$this->isValid) {
-            $this->renderer->renderErrors($this->errors);
+    private function handleField(FieldInterface $field, bool $error = false): void
+    {
+        if (!$error) {
+            $this->renderer->clear();
         }
 
-        return $this->isValid;
+        $value = match (true) {
+            $field instanceof SelectField
+            && $field->isMultipleSelection() => $this->renderer->renderSelectMultipleField($field),
+            $field instanceof SelectField
+            && !$field->isMultipleSelection() => $this->renderer->renderSelectSingleField($field),
+            default => $this->renderer->renderField($field),
+        };
+        $this->values[$field->getName()] = $value;
+
+        $fieldErrors = $field->validate($value);
+        if (!empty($fieldErrors)) {
+            $this->renderer->clear();
+            $this->renderer->renderErrors($fieldErrors);
+            $this->handleField($field, true);
+        }
     }
 
     /**
@@ -96,7 +109,7 @@ class Form
     /**
      * Get all form values
      *
-     * @return array
+     * @return array<string, string|int|float|array<int|string, string>|null>
      */
     public function getValues(): array
     {
@@ -107,20 +120,10 @@ class Form
      * Get a specific form value
      *
      * @param string $fieldName Field name
-     * @return mixed|null Field value or null if not found
+     * @return string|int|float|array<int|string, string>|null Field value or null if not found
      */
-    public function getValue(string $fieldName): mixed
+    public function getValue(string $fieldName): string|int|float|array|null
     {
         return $this->values[$fieldName] ?? null;
-    }
-
-    /**
-     * Get all form errors
-     *
-     * @return array
-     */
-    public function getErrors(): array
-    {
-        return $this->errors;
     }
 }

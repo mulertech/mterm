@@ -45,11 +45,11 @@ class NumberField extends AbstractField
 
     /**
      * @param string $input
-     * @return string|int|float|null
+     * @return string|int|float|array<int|string, string>
      */
-    public function processInput(string $input): string|int|null|float
+    public function processInput(string $input): string|int|float|array
     {
-        if ($input === '') {
+        if ($input === '' && !is_null($this->defaultValue)) {
             return $this->defaultValue;
         }
 
@@ -57,29 +57,33 @@ class NumberField extends AbstractField
     }
 
     /**
-     * @param string|null $value
-     * @return array
+     * @param string|int|float|array<int|string, string>|null $value
+     * @return array<string>
      */
-    public function validate(?string $value): array
+    public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value !== null && $value !== '') {
+        if ($value === '') {
+            return $errors;
+        }
+
+        if (is_numeric($value) || is_string($value)) {
             if (!is_numeric($value)) {
                 $errors[] = "Please enter a valid number.";
                 return $errors;
             }
 
-            if (!$this->allowFloat && floor($value) != $value) {
+            if (!$this->allowFloat && floor((int)$value) != $value) {
                 $errors[] = "Please enter an integer value.";
             }
 
             if ($this->min !== null && $value < $this->min) {
-                $errors[] = "Value must be at least {$this->min}.";
+                $errors[] = "Value must be at least $this->min.";
             }
 
             if ($this->max !== null && $value > $this->max) {
-                $errors[] = "Value cannot exceed {$this->max}.";
+                $errors[] = "Value cannot exceed $this->max.";
             }
         }
 
