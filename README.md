@@ -707,4 +707,780 @@ while (true) {
     $terminal->writeLine('');
 }
 ```
-`
+
+## Form Classes
+
+### AbstractField
+
+#### `__construct(string $name, string $label)`
+
+Constructor for the AbstractField class.
+
+- **Parameters:**
+  - `string $name`: The name of the field.
+  - `string $label`: The label of the field.
+
+#### `getName(): string`
+
+Returns the name of the field.
+
+#### `getLabel(): string`
+
+Returns the label of the field.
+
+#### `getDescription(): ?string`
+
+Returns the description of the field.
+
+#### `setDescription(string $description): self`
+
+Sets the description of the field.
+
+- **Parameters:**
+  - `string $description`: The description of the field.
+
+#### `isRequired(): bool`
+
+Checks if the field is required.
+
+#### `setRequired(bool $required = true): self`
+
+Sets whether the field is required.
+
+- **Parameters:**
+  - `bool $required`: Whether the field is required.
+
+#### `getDefault(): string|int|float|array|null`
+
+Returns the default value of the field.
+
+#### `setDefault(string|int|float|array $defaultValue): self`
+
+Sets the default value of the field.
+
+- **Parameters:**
+  - `string|int|float|array $defaultValue`: The default value of the field.
+
+#### `clearErrors(): void`
+
+Clears the errors of the field.
+
+#### `addValidator(ValidatorInterface $validator): self`
+
+Adds a validator to the field.
+
+- **Parameters:**
+  - `ValidatorInterface $validator`: The validator to add.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+#### `processInput(string $input): string|int|float|array`
+
+Processes the user input.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `setTerminal(Terminal $terminal): self`
+
+Sets the terminal instance for the field.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+
+### CheckboxField
+
+#### `setCheckedValue(string $value): self`
+
+Sets the checked value for the checkbox.
+
+- **Parameters:**
+  - `string $value`: The checked value.
+
+#### `setUncheckedValue(string $value): self`
+
+Sets the unchecked value for the checkbox.
+
+- **Parameters:**
+  - `string $value`: The unchecked value.
+
+#### `processInput(string $input): string|int|float|array`
+
+Processes the user input for the checkbox.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+### ColorField
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the color field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### DateField
+
+#### `setFormat(string $format): self`
+
+Sets the date format.
+
+- **Parameters:**
+  - `string $format`: The date format.
+
+#### `getFormat(): string`
+
+Returns the date format.
+
+#### `processInput(string $input): string|int|float|array`
+
+Processes the user input for the date field.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the date field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### EmailField
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the email field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### FieldInterface
+
+#### `getName(): string`
+
+Returns the name of the field.
+
+#### `getLabel(): string`
+
+Returns the label of the field.
+
+#### `getDescription(): ?string`
+
+Returns the description of the field.
+
+#### `setDescription(string $description): self`
+
+Sets the description of the field.
+
+- **Parameters:**
+  - `string $description`: The description of the field.
+
+#### `isRequired(): bool`
+
+Checks if the field is required.
+
+#### `setRequired(bool $required = true): self`
+
+Sets whether the field is required.
+
+- **Parameters:**
+  - `bool $required`: Whether the field is required.
+
+#### `clearErrors(): void`
+
+Clears the errors of the field.
+
+#### `setDefault(string|int|float|array $defaultValue): self`
+
+Sets the default value of the field.
+
+- **Parameters:**
+  - `string|int|float|array $defaultValue`: The default value of the field.
+
+#### `getDefault(): string|int|float|array|null`
+
+Returns the default value of the field.
+
+#### `processInput(string $input): string|int|float|array`
+
+Processes the user input.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+#### `setTerminal(Terminal $terminal): self`
+
+Sets the terminal instance for the field.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+
+### FileField
+
+#### `setAllowedExtensions(array $extensions): self`
+
+Sets the allowed file extensions.
+
+- **Parameters:**
+  - `array $extensions`: The allowed file extensions.
+
+#### `setMaxSize(int $bytes): self`
+
+Sets the maximum file size.
+
+- **Parameters:**
+  - `int $bytes`: The maximum file size in bytes.
+
+#### `processInput(string $input): string|int|float|array`
+
+Processes the user input for the file field.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the file field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### NumberField
+
+#### `setMin(?float $min): self`
+
+Sets the minimum value for the number field.
+
+- **Parameters:**
+  - `?float $min`: The minimum value.
+
+#### `setMax(?float $max): self`
+
+Sets the maximum value for the number field.
+
+- **Parameters:**
+  - `?float $max`: The maximum value.
+
+#### `setAllowFloat(bool $allowFloat): self`
+
+Sets whether to allow floating-point numbers.
+
+- **Parameters:**
+  - `bool $allowFloat`: Whether to allow floating-point numbers.
+
+#### `processInput(string $input): string|int|float|array`
+
+Processes the user input for the number field.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the number field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### PasswordField
+
+#### `isMaskInput(): bool`
+
+Checks if the input should be masked.
+
+#### `setMaskInput(bool $maskInput = true): self`
+
+Sets whether the input should be masked.
+
+- **Parameters:**
+  - `bool $maskInput`: Whether the input should be masked.
+
+#### `getMaskChar(): string`
+
+Returns the mask character.
+
+#### `setMaskChar(string $maskChar): self`
+
+Sets the mask character.
+
+- **Parameters:**
+  - `string $maskChar`: The mask character.
+
+#### `parseInput(string $input): string`
+
+Parses the user input.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `processInput(string $input = ''): string`
+
+Processes the user input for the password field.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+### RadioField
+
+#### `__construct(string $name, string $label)`
+
+Constructor for the RadioField class.
+
+- **Parameters:**
+  - `string $name`: The name of the field.
+  - `string $label`: The label of the field.
+
+#### `setMultipleSelection(bool $multipleSelection = true): self`
+
+Sets whether multiple selection is allowed.
+
+- **Parameters:**
+  - `bool $multipleSelection`: Whether multiple selection is allowed.
+
+### RangeField
+
+#### `__construct(string $name, string $label)`
+
+Constructor for the RangeField class.
+
+- **Parameters:**
+  - `string $name`: The name of the field.
+  - `string $label`: The label of the field.
+
+#### `setStep(int $step): self`
+
+Sets the step value for the range field.
+
+- **Parameters:**
+  - `int $step`: The step value.
+
+#### `getStep(): int`
+
+Returns the step value for the range field.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the range field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### SelectField
+
+#### `__construct(string $name, string $label, bool $multipleSelection = false)`
+
+Constructor for the SelectField class.
+
+- **Parameters:**
+  - `string $name`: The name of the field.
+  - `string $label`: The label of the field.
+  - `bool $multipleSelection`: Whether multiple selection is allowed.
+
+#### `setOptions(array $options): self`
+
+Sets the options for the select field.
+
+- **Parameters:**
+  - `array $options`: The options for the select field.
+
+#### `setMultipleSelection(bool $multipleSelection = true): self`
+
+Sets whether multiple selection is allowed.
+
+- **Parameters:**
+  - `bool $multipleSelection`: Whether multiple selection is allowed.
+
+#### `isMultipleSelection(): bool`
+
+Checks if multiple selection is allowed.
+
+#### `parseInput(string $input): string`
+
+Parses the user input.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `processInput(string $input = ''): string|array`
+
+Processes the user input for the select field.
+
+- **Parameters:**
+  - `string $input`: The raw input from the user.
+
+#### `renderSelectMultipleField(Terminal $terminal): array`
+
+Renders the select field for multiple selection.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+
+#### `renderSelectSingleField(Terminal $terminal): string`
+
+Renders the select field for single selection.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the select field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+#### `getCurrentOption(): string`
+
+Returns the current selected option.
+
+### TextField
+
+#### `setMinLength(int $minLength): self`
+
+Sets the minimum length for the text field.
+
+- **Parameters:**
+  - `int $minLength`: The minimum length.
+
+#### `setMaxLength(?int $maxLength): self`
+
+Sets the maximum length for the text field.
+
+- **Parameters:**
+  - `?int $maxLength`: The maximum length.
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the text field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### UrlField
+
+#### `validate(string|int|float|array|null $value): array`
+
+Validates the URL field value.
+
+- **Parameters:**
+  - `string|int|float|array|null $value`: The value to validate.
+
+### Form
+
+#### `__construct(Terminal $terminal)`
+
+Constructor for the Form class.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+
+#### `addField(FieldInterface $field): self`
+
+Adds a field to the form.
+
+- **Parameters:**
+  - `FieldInterface $field`: The field to add.
+
+#### `handle(): void`
+
+Handles the form submission.
+
+#### `isSubmitted(): bool`
+
+Checks if the form has been submitted.
+
+#### `isValid(): bool`
+
+Checks if the form is valid.
+
+#### `getValues(): array`
+
+Returns all form values.
+
+#### `getValue(string $fieldName): string|int|float|array|null`
+
+Returns a specific form value.
+
+- **Parameters:**
+  - `string $fieldName`: The name of the field.
+
+### FormRenderer
+
+#### `__construct(Terminal $terminal)`
+
+Constructor for the FormRenderer class.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+
+#### `renderField(FieldInterface $field): string|array`
+
+Renders a field.
+
+- **Parameters:**
+  - `FieldInterface $field`: The field to render.
+
+#### `renderErrors(array $errors): void`
+
+Renders the errors.
+
+- **Parameters:**
+  - `array $errors`: The errors to render.
+
+#### `clear(): void`
+
+Clears the terminal screen.
+
+### ValidatorInterface
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### AbstractValidator
+
+#### `__construct(string $errorMessage)`
+
+Constructor for the AbstractValidator class.
+
+- **Parameters:**
+  - `string $errorMessage`: The error message.
+
+#### `getErrorMessage(): string`
+
+Returns the error message.
+
+### ChoiceValidator
+
+#### `__construct(array $choices, bool $strict = true, string $errorMessage = "Selected value is not a valid choice.")`
+
+Constructor for the ChoiceValidator class.
+
+- **Parameters:**
+  - `array $choices`: The valid choices.
+  - `bool $strict`: Whether to use strict comparison.
+  - `string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### DateValidator
+
+#### `__construct(string $format = 'Y-m-d', ?DateTimeInterface $minDate = null, ?DateTimeInterface $maxDate = null, ?string $errorMessage = null)`
+
+Constructor for the DateValidator class.
+
+- **Parameters:**
+  - `string $format`: The date format.
+  - `?DateTimeInterface $minDate`: The minimum date.
+  - `?DateTimeInterface $maxDate`: The maximum date.
+  - `?string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### EmailValidator
+
+#### `__construct(string $errorMessage = "Please enter a valid email address.")`
+
+Constructor for the EmailValidator class.
+
+- **Parameters:**
+  - `string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### IpAddressValidator
+
+#### `__construct(bool $allowIPv4 = true, bool $allowIPv6 = true, bool $allowPrivate = true, bool $allowReserved = true, string $errorMessage = "Please enter a valid IP address.")`
+
+Constructor for the IpAddressValidator class.
+
+- **Parameters:**
+  - `bool $allowIPv4`: Whether to allow IPv4 addresses.
+  - `bool $allowIPv6`: Whether to allow IPv6 addresses.
+  - `bool $allowPrivate`: Whether to allow private addresses.
+  - `bool $allowReserved`: Whether to allow reserved addresses.
+  - `string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### LengthValidator
+
+#### `__construct(?int $min = null, ?int $max = null, ?string $errorMessage = null)`
+
+Constructor for the LengthValidator class.
+
+- **Parameters:**
+  - `?int $min`: The minimum length.
+  - `?int $max`: The maximum length.
+  - `?string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### NotEmptyValidator
+
+#### `__construct(string $errorMessage = "This value cannot be empty.")`
+
+Constructor for the NotEmptyValidator class.
+
+- **Parameters:**
+  - `string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### NumericRangeValidator
+
+#### `__construct(?float $min = null, ?float $max = null, ?string $errorMessage = null)`
+
+Constructor for the NumericRangeValidator class.
+
+- **Parameters:**
+  - `?float $min`: The minimum value.
+  - `?float $max`: The maximum value.
+  - `?string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### PatternValidator
+
+#### `__construct(string $pattern, string $errorMessage = "Value does not match required pattern.")`
+
+Constructor for the PatternValidator class.
+
+- **Parameters:**
+  - `string $pattern`: The pattern to match.
+  - `string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+### RegexValidator
+
+#### `__construct(string $pattern, string $errorMessage = "This value is not valid.")`
+
+Constructor for the RegexValidator class.
+
+- **Parameters:**
+  - `string $pattern`: The pattern to match.
+  - `string $errorMessage`: The error message.
+
+#### `validate(mixed $value): ?string`
+
+Validates a value.
+
+- **Parameters:**
+  - `mixed $value`: The value to validate.
+
+## Utils Classes
+
+### ProgressBar
+
+#### `__construct(Terminal $terminal, int $total = 100, int $width = 50, string $completeChar = '=', string $incompleteChar = '-', string $color = Terminal::COLORS['green'])`
+
+Constructor for the ProgressBar class.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+  - `int $total`: The total value.
+  - `int $width`: The width of the progress bar.
+  - `string $completeChar`: The character for completed progress.
+  - `string $incompleteChar`: The character for incomplete progress.
+  - `string $color`: The color of the progress bar.
+
+#### `start(): void`
+
+Starts the progress bar.
+
+#### `advance(int $step = 1): void`
+
+Advances the progress bar by a specific amount.
+
+- **Parameters:**
+  - `int $step`: The amount to advance.
+
+#### `setProgress(int $current): void`
+
+Sets the progress to a specific value.
+
+- **Parameters:**
+  - `int $current`: The new progress value.
+
+#### `finish(): void`
+
+Finishes the progress bar.
+
+### TableFormatter
+
+#### `__construct(Terminal $terminal, string $headerColor = Terminal::COLORS['green'], string $borderColor = Terminal::COLORS['blue'], string $cellColor = Terminal::COLORS['white'], int $padding = 1)`
+
+Constructor for the TableFormatter class.
+
+- **Parameters:**
+  - `Terminal $terminal`: The terminal instance.
+  - `string $headerColor`: The color of the header.
+  - `string $borderColor`: The color of the border.
+  - `string $cellColor`: The color of the cells.
+  - `int $padding`: The padding for the cells.
+
+#### `renderTable(array $headers, array $rows): void`
+
+Formats and renders a table.
+
+- **Parameters:**
+  - `array $headers`: The table headers.
+  - `array $rows`: The table data rows.
