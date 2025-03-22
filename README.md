@@ -47,14 +47,8 @@ MTerm provides a simple and elegant way to build interactive command-line interf
 ### Basic Usage
 
 ```php
-use MulerTech\MTerm\Terminal;
-
 $terminal = new Terminal();
-
-// Display simple text
 $terminal->write('Hello, World!');
-
-// Display text with a new line
 $terminal->writeLine('Hello with a new line!');
 ```
 
@@ -73,17 +67,8 @@ Here's a comprehensive guide to all public methods in the Terminal class:
 Reads a line of input from the terminal.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-// Read input with a prompt
 $name = $terminal->read('Enter your name: ');
-$terminal->writeLine("Hello, $name!");
-
-// Read input without a prompt
-$terminal->writeLine('Press Enter to continue...');
-$input = $terminal->read();
+$input = $terminal->read(); // No prompt
 ```
 
 ##### `readChar(string $prompt = null): string`
@@ -91,16 +76,9 @@ $input = $terminal->read();
 Reads a single character from the terminal.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-// Read a single character with a prompt
-$char = $terminal->readChar('Press any key to continue (y/n): ');
+$char = $terminal->readChar('Continue? (y/n): ');
 if ($char === 'y') {
-    $terminal->writeLine('You pressed y!');
-} else {
-    $terminal->writeLine('You pressed ' . $char);
+    // Process confirmation
 }
 ```
 
@@ -111,26 +89,9 @@ if ($char === 'y') {
 Writes text to the terminal without a newline.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-// Write plain text
-$terminal->write('This is regular text. ');
-
-// Write colored text
-$terminal->write('This is red text. ', 'red');
-
-// Write bold text
-$terminal->write('This is bold blue text. ', 'blue', true);
-
-// Create a progress indicator
-$terminal->write('Loading ');
-for ($i = 0; $i < 5; $i++) {
-    $terminal->write('.');
-    sleep(1);
-}
-$terminal->writeLine(' Done!', 'green');
+$terminal->write('Regular text ');
+$terminal->write('Red text ', 'red');
+$terminal->write('Bold blue ', 'blue', true);
 ```
 
 ##### `writeLine(string $text, string $color = null, bool $bold = false): void`
@@ -138,24 +99,9 @@ $terminal->writeLine(' Done!', 'green');
 Writes text to the terminal followed by a newline.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-// Write plain text with newline
 $terminal->writeLine('First line');
-
-// Write colored text with newline
 $terminal->writeLine('Success message', 'green');
-
-// Write bold colored text with newline
 $terminal->writeLine('Error message', 'red', true);
-
-// Create a multi-line message
-$terminal->writeLine('Menu Options:', 'blue', true);
-$terminal->writeLine('1. Option One');
-$terminal->writeLine('2. Option Two');
-$terminal->writeLine('3. Exit');
 ```
 
 #### Terminal Control
@@ -165,56 +111,25 @@ $terminal->writeLine('3. Exit');
 Clears the terminal screen.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-$terminal->writeLine('This text will be cleared in 2 seconds...');
-sleep(2);
 $terminal->clear();
-$terminal->writeLine('Screen has been cleared!', 'green');
 ```
 
 ##### `specialMode(): void`
 
-Sets the terminal to special mode (non-canonical mode with echo disabled) where characters are read immediately without waiting for Enter.
+Sets the terminal to special mode where characters are read immediately.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-$terminal->writeLine('Press any key to navigate (q to quit)');
-$terminal->specialMode(); // Enable immediate character reading
-
-try {
-    while (true) {
-        $char = $terminal->readChar();
-        if ($char === 'q') {
-            break;
-        }
-        $terminal->writeLine('You pressed: ' . $char);
-    }
-} finally {
-    $terminal->normalMode(); // Restore normal terminal behavior
-}
+$terminal->specialMode();
+// Read characters without waiting for Enter
+$terminal->normalMode(); // Return to standard mode
 ```
 
 ##### `normalMode(): void`
 
-Restores the terminal to its normal mode (canonical mode with echo enabled).
+Restores the terminal to its normal mode.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-// Example of returning to normal mode after special mode
-$terminal->specialMode();
-$terminal->writeLine('In special mode, press any key...');
-$char = $terminal->readChar();
 $terminal->normalMode();
-$terminal->writeLine('Back to normal mode. You pressed: ' . $char);
 ```
 
 ##### `system(string $command): void`
@@ -222,17 +137,7 @@ $terminal->writeLine('Back to normal mode. You pressed: ' . $char);
 Executes a system command.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-// Run a system command
-$terminal->writeLine('Current directory content:', 'cyan');
 $terminal->system('ls -la');
-
-// Another example
-$terminal->writeLine('Date and time:', 'yellow');
-$terminal->system('date');
 ```
 
 #### Utility Methods
@@ -242,111 +147,51 @@ $terminal->system('date');
 Checks if the terminal supports ANSI color codes.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
 if ($terminal->supportsAnsi()) {
-    $terminal->writeLine('Your terminal supports ANSI colors!', 'green');
-} else {
-    $terminal->writeLine('Your terminal does not support ANSI colors.');
+    $terminal->writeLine('Colors supported', 'green');
 }
 ```
 
-##### `inputStream()`
+##### `inputStream(): resource`
 
-Returns the input stream resource (STDIN by default).
+Returns the input stream resource.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
-// Get the input stream and check if it's a resource
 $stream = $terminal->inputStream();
-if (is_resource($stream)) {
-    $terminal->writeLine('Successfully accessed the input stream!', 'green');
-}
 ```
 
 ### Available Colors
 
-The Terminal class supports the following colors:
-
-- black
-- red
-- green
-- yellow
-- blue
-- magenta
-- cyan
-- white
-
-Each color can also be displayed in bold by setting the third parameter to `true` in `write()` or `writeLine()` methods.
+The Terminal class supports: black, red, green, yellow, blue, magenta, cyan, white.
 
 ### Creating Interactive Menus
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-
-$terminal = new Terminal();
-
 function showMenu($terminal) {
     $terminal->clear();
-    $terminal->writeLine('=== MAIN MENU ===', 'blue', true);
+    $terminal->writeLine('=== MENU ===', 'blue', true);
     $terminal->writeLine('1. Option One');
-    $terminal->writeLine('2. Option Two');
-    $terminal->writeLine('3. Exit');
-    $terminal->writeLine('');
-    return $terminal->read('Select an option: ');
+    $terminal->writeLine('2. Exit');
+    return $terminal->read('Select: ');
 }
 
-$running = true;
-while ($running) {
+while (true) {
     $choice = showMenu($terminal);
-    
-    switch ($choice) {
-        case '1':
-            $terminal->writeLine('You selected Option One', 'green');
-            sleep(2);
-            break;
-        case '2':
-            $terminal->writeLine('You selected Option Two', 'yellow');
-            sleep(2);
-            break;
-        case '3':
-            $terminal->writeLine('Exiting...', 'red');
-            $running = false;
-            break;
-        default:
-            $terminal->writeLine('Invalid option!', 'red');
-            sleep(1);
-            break;
-    }
+    if ($choice === '2') break;
 }
 ```
 
 ## Command System
 
-MTerm includes a robust command system that allows you to create and manage terminal commands easily.
+MTerm includes a robust command system for creating and managing terminal commands.
 
 ### CommandInterface
 
 This interface defines the basic structure for all commands.
 
 ```php
-use MulerTech\MTerm\Command\CommandInterface;
-use MulerTech\MTerm\Core\Terminal;
-
 class HelloCommand implements CommandInterface
 {
-    private Terminal $terminal;
-    
-    public function __construct(Terminal $terminal) 
-    {
-        $this->terminal = $terminal;
-    }
-    
     public function getName(): string
     {
         return 'hello';
@@ -354,14 +199,14 @@ class HelloCommand implements CommandInterface
     
     public function getDescription(): string
     {
-        return 'Displays a greeting to the specified name';
+        return 'Greets a user';
     }
     
     public function execute(array $args = []): int
     {
         $name = $args[0] ?? 'World';
-        $this->terminal->writeLine("Hello, $name!", 'green');
-        return 0; // Success
+        $this->terminal->writeLine("Hello, $name!");
+        return 0;
     }
 }
 ```
@@ -371,162 +216,68 @@ class HelloCommand implements CommandInterface
 A base class that implements basic functionality for CommandInterface.
 
 ```php
-use MulerTech\MTerm\Command\AbstractCommand;
-use MulerTech\MTerm\Core\Terminal;
-
 class DateCommand extends AbstractCommand
 {
     public function __construct(Terminal $terminal) 
     {
         parent::__construct($terminal);
         $this->name = 'date';
-        $this->description = 'Displays the current date and time';
+        $this->description = 'Shows date/time';
     }
     
     public function execute(array $args = []): int
     {
         $format = $args[0] ?? 'Y-m-d H:i:s';
-        $this->terminal->writeLine(date($format), 'cyan');
-        
-        // Show command help when --help argument is provided
-        if (in_array('--help', $args, true)) {
-            $this->showHelp();
-        }
-        
+        $this->terminal->writeLine(date($format));
         return 0;
     }
 }
 
-// Example usage:
-$terminal = new Terminal();
-$dateCommand = new DateCommand($terminal);
-
-// Get command information
-$name = $dateCommand->getName(); // Returns 'date'
-$description = $dateCommand->getDescription(); // Returns 'Displays the current date and time'
-
-// Show help information
-$dateCommand->showHelp(); // Displays: "date: Displays the current date and time"
-
-// Execute the command
-$dateCommand->execute(); // Displays current date in default format
-$dateCommand->execute(['d/m/Y']); // Displays current date in specified format
+// Usage
+$cmd = new DateCommand($terminal);
+$cmd->execute(['Y-m-d']); // Shows date in specified format
 ```
 
 ### CommandRegistry
 
-Manages a collection of commands, allowing you to register, retrieve, and execute them.
+Manages a collection of commands.
 
 ```php
-use MulerTech\MTerm\Command\CommandRegistry;
-use MulerTech\MTerm\Core\Terminal;
-
-// Create a terminal and command registry
-$terminal = new Terminal();
 $registry = new CommandRegistry();
 
-// Create some commands
-$helloCommand = new HelloCommand($terminal);
-$dateCommand = new DateCommand($terminal);
-
-// Register commands
-$registry->register($helloCommand);
-$registry->register($dateCommand);
-
-// Check if a command exists
-if ($registry->has('hello')) {
-    $terminal->writeLine('Hello command is registered!', 'green');
-}
-
-// Get a specific command
-$command = $registry->get('date');
-if ($command !== null) {
-    $terminal->writeLine('Found command: ' . $command->getName());
-    $command->execute();
-}
-
-// Get all registered commands
-$allCommands = $registry->getAll();
-$terminal->writeLine('Registered commands:', 'yellow');
-foreach ($allCommands as $name => $cmd) {
-    $terminal->writeLine(" - $name: " . $cmd->getDescription());
-}
-
-// Execute a command
-try {
-    $exitCode = $registry->execute('hello', ['User']);
-    $terminal->writeLine("Command executed with exit code: $exitCode");
-    
-    // This will throw an exception
-    $registry->execute('unknown-command');
-} catch (\InvalidArgumentException $e) {
-    $terminal->writeLine($e->getMessage(), 'red');
-}
+$registry->register(new HelloCommand($terminal));
+$registry->has('hello'); // Check if exists
+$command = $registry->get('date'); // Get specific command
+$allCommands = $registry->getAll(); // Get all commands
+$registry->execute('hello', ['User']); // Execute with arguments
 ```
 
-### Building a Simple CLI Application
-
-Here's an example of how to build a simple CLI application using MTerm's command system:
+### Simple CLI Application
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-use MulerTech\MTerm\Command\CommandRegistry;
-
-// Initialize terminal and command registry
 $terminal = new Terminal();
 $registry = new CommandRegistry();
 
-// Register available commands
+// Register commands
 $registry->register(new HelloCommand($terminal));
-$registry->register(new DateCommand($terminal));
-// Register more commands...
 
-// Display welcome message
-$terminal->writeLine('Welcome to My CLI Application', 'blue', true);
-$terminal->writeLine('Type "help" to see available commands or "exit" to quit', 'yellow');
-
-// Main application loop
+// Main loop
 while (true) {
-    // Show prompt and get command
     $input = $terminal->read('> ');
     $parts = explode(' ', $input);
     $commandName = array_shift($parts);
     
-    // Handle exit command
-    if ($commandName === 'exit') {
-        $terminal->writeLine('Goodbye!', 'cyan');
-        break;
-    }
+    if ($commandName === 'exit') break;
     
-    // Handle help command
-    if ($commandName === 'help') {
-        $terminal->writeLine('Available commands:', 'green', true);
-        foreach ($registry->getAll() as $name => $command) {
-            $terminal->writeLine(" - $name: " . $command->getDescription());
-        }
-        continue;
-    }
-    
-    // Execute the command if it exists
-    try {
-        if ($registry->has($commandName)) {
-            $exitCode = $registry->execute($commandName, $parts);
-            if ($exitCode !== 0) {
-                $terminal->writeLine("Command returned non-zero exit code: $exitCode", 'yellow');
-            }
-        } else {
-            $terminal->writeLine("Unknown command: $commandName", 'red');
-            $terminal->writeLine('Type "help" to see available commands', 'yellow');
-        }
-    } catch (\Exception $e) {
-        $terminal->writeLine('Error: ' . $e->getMessage(), 'red', true);
+    if ($registry->has($commandName)) {
+        $registry->execute($commandName, $parts);
     }
 }
 ```
 
 ## Application Class
 
-The Application class implements a singleton pattern for managing terminal interactions and command execution.
+The Application class implements a singleton pattern for managing terminal interactions.
 
 ### Method Reference
 
@@ -535,47 +286,25 @@ The Application class implements a singleton pattern for managing terminal inter
 Gets the singleton instance of the Application class.
 
 ```php
-use MulerTech\MTerm\Core\Application;
-
-// Get the application instance
 $app = Application::getInstance();
-
-// The same instance will be returned on subsequent calls
-$sameApp = Application::getInstance();
 ```
 
 #### `getTerminal(): Terminal`
 
-Returns the Terminal instance managed by the Application.
+Returns the Terminal instance.
 
 ```php
-use MulerTech\MTerm\Core\Application;
-
-$app = Application::getInstance();
 $terminal = $app->getTerminal();
-
-// Now you can use the terminal to interact with the user
-$terminal->writeLine('Welcome to MTerm Application!', 'green');
-$name = $terminal->read('Please enter your name: ');
-$terminal->writeLine("Hello, $name!", 'blue');
+$terminal->writeLine('Hello!');
 ```
 
 #### `getCommandRunner(): CommandRunner`
 
-Returns the CommandRunner instance managed by the Application.
+Returns the CommandRunner instance.
 
 ```php
-use MulerTech\MTerm\Core\Application;
-
-$app = Application::getInstance();
-$commandRunner = $app->getCommandRunner();
-
-// Now you can execute system commands
-$result = $commandRunner->run('ls -la');
-$app->getTerminal()->writeLine('Command output:', 'yellow');
-foreach ($result['output'] as $line) {
-    $app->getTerminal()->writeLine($line);
-}
+$runner = $app->getCommandRunner();
+$result = $runner->run('ls -la');
 ```
 
 #### `run(): void`
@@ -583,128 +312,47 @@ foreach ($result['output'] as $line) {
 Starts the application's main execution loop.
 
 ```php
-use MulerTech\MTerm\Core\Application;
-
-// Get the application instance and run it
 $app = Application::getInstance();
 $app->run();
 ```
 
 ## CommandRunner Class
 
-The CommandRunner class provides methods to execute system commands and capture their output.
+The CommandRunner class provides methods to execute system commands.
 
 ### Method Reference
 
 #### `run(string $command): array`
 
-Executes a command and returns an array containing the output and return code.
+Executes a command and returns output and return code.
 
 ```php
-use MulerTech\MTerm\Core\CommandRunner;
-use MulerTech\MTerm\Core\Terminal;
-
-$commandRunner = new CommandRunner();
-$terminal = new Terminal();
-
-// Run a command and display its output
-$result = $commandRunner->run('echo "Hello from the command line"');
-
-$terminal->writeLine('Command output:', 'cyan');
-foreach ($result['output'] as $line) {
-    $terminal->writeLine($line);
-}
-
-$terminal->writeLine('Return code: ' . $result['returnCode'], 'yellow');
-
-// Example with a more complex command
-$result = $commandRunner->run('find /path/to/directory -name "*.php" | wc -l');
-$terminal->writeLine('Number of PHP files: ' . $result['output'][0], 'green');
+$runner = new CommandRunner();
+$result = $runner->run('echo "Hello"');
+// Returns ['output' => ['Hello'], 'returnCode' => 0]
 ```
 
 #### `runWithStderr(string $command): array`
 
-Executes a command and returns an array containing stdout, stderr, and the return code.
+Executes a command and returns stdout, stderr, and return code.
 
 ```php
-use MulerTech\MTerm\Core\CommandRunner;
-use MulerTech\MTerm\Core\Terminal;
-
-$commandRunner = new CommandRunner();
-$terminal = new Terminal();
-
-// Run a command that might produce errors
-$result = $commandRunner->runWithStderr('ls /nonexistent/directory');
-
-// Display standard output if any
-if ($result['stdout']) {
-    $terminal->writeLine('Command output:', 'green');
-    $terminal->writeLine($result['stdout']);
-}
-
-// Display error output if any
-if ($result['stderr']) {
-    $terminal->writeLine('Error output:', 'red');
-    $terminal->writeLine($result['stderr']);
-}
-
-$terminal->writeLine('Return code: ' . $result['returnCode'], 'yellow');
-
-// Example with a successful command
-$result = $commandRunner->runWithStderr('echo "Success" && echo "Warning" >&2');
-$terminal->writeLine('Standard output: ' . $result['stdout'], 'green');
-$terminal->writeLine('Error output: ' . $result['stderr'], 'yellow');
+$result = $runner->runWithStderr('ls /nonexistent');
+// Returns ['stdout' => '', 'stderr' => 'error message...', 'returnCode' => 1]
 ```
 
-### Combining Application, Terminal, and CommandRunner
-
-Here's an example of how to use all three classes together to build a simple command execution utility:
+### Combining Classes Example
 
 ```php
-use MulerTech\MTerm\Core\Application;
-
-// Get the application instance
 $app = Application::getInstance();
 $terminal = $app->getTerminal();
-$commandRunner = $app->getCommandRunner();
+$runner = $app->getCommandRunner();
 
-// Welcome message
-$terminal->clear();
-$terminal->writeLine('=== Command Execution Utility ===', 'blue', true);
-$terminal->writeLine('Type a command to execute or "exit" to quit', 'yellow');
-$terminal->writeLine('');
-
-// Main loop
-while (true) {
-    $command = $terminal->read('> ');
-    
-    if ($command === 'exit') {
-        $terminal->writeLine('Goodbye!', 'green');
-        break;
-    }
-    
-    if (empty($command)) {
-        continue;
-    }
-    
-    $terminal->writeLine('Executing: ' . $command, 'cyan');
-    
-    $result = $commandRunner->runWithStderr($command);
-    
-    if ($result['stdout']) {
-        $terminal->writeLine('Output:', 'green');
-        $terminal->writeLine($result['stdout']);
-    }
-    
-    if ($result['stderr']) {
-        $terminal->writeLine('Errors:', 'red');
-        $terminal->writeLine($result['stderr']);
-    }
-    
-    $status = $result['returnCode'] === 0 ? 'Success' : 'Failed';
-    $color = $result['returnCode'] === 0 ? 'green' : 'red';
-    $terminal->writeLine('Status: ' . $status . ' (code: ' . $result['returnCode'] . ')', $color);
-    $terminal->writeLine('');
+$command = $terminal->read('Command: ');
+$result = $runner->runWithStderr($command);
+$terminal->writeLine($result['stdout']);
+if ($result['stderr']) {
+    $terminal->writeLine($result['stderr'], 'red');
 }
 ```
 
