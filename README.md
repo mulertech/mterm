@@ -716,82 +716,123 @@ while (true) {
 
 Constructor for the AbstractField class.
 
-- **Parameters:**
-  - `string $name`: The name of the field.
-  - `string $label`: The label of the field.
+```php
+use MulerTech\MTerm\Core\Terminal;
+use MulerTech\MTerm\Form\AbstractField;
+
+$field = new AbstractField('username', 'Username');
+$field->setDescription('Enter your username');
+$field->setRequired(true);
+$field->setDefault('guest');
+$field->setTerminal(new Terminal());
+```
 
 #### `getName(): string`
 
 Returns the name of the field.
 
+```php
+$field->getName(); // Returns 'username'
+```
+
 #### `getLabel(): string`
 
 Returns the label of the field.
+
+```php
+$field->getLabel(); // Returns 'Username'
+```
 
 #### `getDescription(): ?string`
 
 Returns the description of the field.
 
+```php
+$field->getDescription(); // Returns 'Enter your username'
+```
+
 #### `setDescription(string $description): self`
 
 Sets the description of the field.
 
-- **Parameters:**
-  - `string $description`: The description of the field.
+```php
+$field->setDescription('Enter your username');
+```
 
 #### `isRequired(): bool`
 
 Checks if the field is required.
 
+```php
+$field->isRequired(); // Returns true
+```
+
 #### `setRequired(bool $required = true): self`
 
 Sets whether the field is required.
 
-- **Parameters:**
-  - `bool $required`: Whether the field is required.
+```php
+$field->setRequired(true);
+```
 
 #### `getDefault(): string|int|float|array|null`
 
 Returns the default value of the field.
 
+```php
+$field->getDefault(); // Returns 'guest'
+```
+
 #### `setDefault(string|int|float|array $defaultValue): self`
 
 Sets the default value of the field.
 
-- **Parameters:**
-  - `string|int|float|array $defaultValue`: The default value of the field.
+```php
+$field->setDefault('guest');
+```
 
 #### `clearErrors(): void`
 
 Clears the errors of the field.
 
+```php
+$field->clearErrors();
+```
+
 #### `addValidator(ValidatorInterface $validator): self`
 
 Adds a validator to the field.
 
-- **Parameters:**
-  - `ValidatorInterface $validator`: The validator to add.
+```php
+use MulerTech\MTerm\Validator\NotEmptyValidator;
+
+$validator = new NotEmptyValidator();
+$field->addValidator($validator);
+```
 
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+$errors = $field->validate(''); // Returns array of errors
+```
 
 #### `processInput(string $input): string|int|float|array`
 
 Processes the user input.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->processInput('guest'); // Returns processed value
+```
 
 #### `setTerminal(Terminal $terminal): self`
 
 Sets the terminal instance for the field.
 
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
+```php
+$field->setTerminal(new Terminal());
+```
 
 ### CheckboxField
 
@@ -799,22 +840,28 @@ Sets the terminal instance for the field.
 
 Sets the checked value for the checkbox.
 
-- **Parameters:**
-  - `string $value`: The checked value.
+```php
+use MulerTech\MTerm\Form\CheckboxField;
+
+$field = new CheckboxField('accept_terms', 'Accept Terms');
+$field->setCheckedValue('yes');
+```
 
 #### `setUncheckedValue(string $value): self`
 
 Sets the unchecked value for the checkbox.
 
-- **Parameters:**
-  - `string $value`: The unchecked value.
+```php
+$field->setUncheckedValue('no');
+```
 
 #### `processInput(string $input): string|int|float|array`
 
 Processes the user input for the checkbox.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->processInput('yes'); // Returns 'yes'
+```
 
 ### ColorField
 
@@ -822,8 +869,12 @@ Processes the user input for the checkbox.
 
 Validates the color field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+use MulerTech\MTerm\Form\ColorField;
+
+$field = new ColorField('favorite_color', 'Favorite Color');
+$errors = $field->validate('red'); // Returns array of errors
+```
 
 ### DateField
 
@@ -831,26 +882,36 @@ Validates the color field value.
 
 Sets the date format.
 
-- **Parameters:**
-  - `string $format`: The date format.
+```php
+use MulerTech\MTerm\Form\DateField;
+
+$field = new DateField('birthdate', 'Birthdate');
+$field->setFormat('Y-m-d');
+```
 
 #### `getFormat(): string`
 
 Returns the date format.
 
+```php
+$field->getFormat(); // Returns 'Y-m-d'
+```
+
 #### `processInput(string $input): string|int|float|array`
 
 Processes the user input for the date field.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->processInput('2022-01-01'); // Returns processed value
+```
 
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the date field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+$errors = $field->validate('2022-01-01'); // Returns array of errors
+```
 
 ### EmailField
 
@@ -858,8 +919,12 @@ Validates the date field value.
 
 Validates the email field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+use MulerTech\MTerm\Form\EmailField;
+
+$field = new EmailField('email', 'Email');
+$errors = $field->validate('user@example.com'); // Returns array of errors
+```
 
 ### FieldInterface
 
@@ -879,9 +944,6 @@ Returns the description of the field.
 
 Sets the description of the field.
 
-- **Parameters:**
-  - `string $description`: The description of the field.
-
 #### `isRequired(): bool`
 
 Checks if the field is required.
@@ -889,9 +951,6 @@ Checks if the field is required.
 #### `setRequired(bool $required = true): self`
 
 Sets whether the field is required.
-
-- **Parameters:**
-  - `bool $required`: Whether the field is required.
 
 #### `clearErrors(): void`
 
@@ -901,9 +960,6 @@ Clears the errors of the field.
 
 Sets the default value of the field.
 
-- **Parameters:**
-  - `string|int|float|array $defaultValue`: The default value of the field.
-
 #### `getDefault(): string|int|float|array|null`
 
 Returns the default value of the field.
@@ -912,22 +968,13 @@ Returns the default value of the field.
 
 Processes the user input.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
-
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
-
 #### `setTerminal(Terminal $terminal): self`
 
 Sets the terminal instance for the field.
-
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
 
 ### FileField
 
@@ -935,29 +982,36 @@ Sets the terminal instance for the field.
 
 Sets the allowed file extensions.
 
-- **Parameters:**
-  - `array $extensions`: The allowed file extensions.
+```php
+use MulerTech\MTerm\Form\FileField;
+
+$field = new FileField('profile_picture', 'Profile Picture');
+$field->setAllowedExtensions(['jpg', 'png']);
+```
 
 #### `setMaxSize(int $bytes): self`
 
 Sets the maximum file size.
 
-- **Parameters:**
-  - `int $bytes`: The maximum file size in bytes.
+```php
+$field->setMaxSize(1048576); // 1 MB
+```
 
 #### `processInput(string $input): string|int|float|array`
 
 Processes the user input for the file field.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->processInput('path/to/file.jpg'); // Returns processed value
+```
 
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the file field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+$errors = $field->validate('path/to/file.jpg'); // Returns array of errors
+```
 
 ### NumberField
 
@@ -965,36 +1019,44 @@ Validates the file field value.
 
 Sets the minimum value for the number field.
 
-- **Parameters:**
-  - `?float $min`: The minimum value.
+```php
+use MulerTech\MTerm\Form\NumberField;
+
+$field = new NumberField('age', 'Age');
+$field->setMin(18);
+```
 
 #### `setMax(?float $max): self`
 
 Sets the maximum value for the number field.
 
-- **Parameters:**
-  - `?float $max`: The maximum value.
+```php
+$field->setMax(99);
+```
 
 #### `setAllowFloat(bool $allowFloat): self`
 
 Sets whether to allow floating-point numbers.
 
-- **Parameters:**
-  - `bool $allowFloat`: Whether to allow floating-point numbers.
+```php
+$field->setAllowFloat(false);
+```
 
 #### `processInput(string $input): string|int|float|array`
 
 Processes the user input for the number field.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->processInput('25'); // Returns processed value
+```
 
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the number field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+$errors = $field->validate('25'); // Returns array of errors
+```
 
 ### PasswordField
 
@@ -1002,37 +1064,52 @@ Validates the number field value.
 
 Checks if the input should be masked.
 
+```php
+use MulerTech\MTerm\Form\PasswordField;
+
+$field = new PasswordField('password', 'Password');
+$field->isMaskInput(); // Returns true
+```
+
 #### `setMaskInput(bool $maskInput = true): self`
 
 Sets whether the input should be masked.
 
-- **Parameters:**
-  - `bool $maskInput`: Whether the input should be masked.
+```php
+$field->setMaskInput(true);
+```
 
 #### `getMaskChar(): string`
 
 Returns the mask character.
 
+```php
+$field->getMaskChar(); // Returns '*'
+```
+
 #### `setMaskChar(string $maskChar): self`
 
 Sets the mask character.
 
-- **Parameters:**
-  - `string $maskChar`: The mask character.
+```php
+$field->setMaskChar('*');
+```
 
 #### `parseInput(string $input): string`
 
 Parses the user input.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->parseInput('password'); // Returns parsed value
+```
 
 #### `processInput(string $input = ''): string`
 
 Processes the user input for the password field.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->processInput('password'); // Returns processed value
+```
 
 ### RadioField
 
@@ -1040,16 +1117,19 @@ Processes the user input for the password field.
 
 Constructor for the RadioField class.
 
-- **Parameters:**
-  - `string $name`: The name of the field.
-  - `string $label`: The label of the field.
+```php
+use MulerTech\MTerm\Form\RadioField;
+
+$field = new RadioField('gender', 'Gender');
+```
 
 #### `setMultipleSelection(bool $multipleSelection = true): self`
 
 Sets whether multiple selection is allowed.
 
-- **Parameters:**
-  - `bool $multipleSelection`: Whether multiple selection is allowed.
+```php
+$field->setMultipleSelection(false);
+```
 
 ### RangeField
 
@@ -1057,27 +1137,35 @@ Sets whether multiple selection is allowed.
 
 Constructor for the RangeField class.
 
-- **Parameters:**
-  - `string $name`: The name of the field.
-  - `string $label`: The label of the field.
+```php
+use MulerTech\MTerm\Form\RangeField;
+
+$field = new RangeField('rating', 'Rating');
+```
 
 #### `setStep(int $step): self`
 
 Sets the step value for the range field.
 
-- **Parameters:**
-  - `int $step`: The step value.
+```php
+$field->setStep(1);
+```
 
 #### `getStep(): int`
 
 Returns the step value for the range field.
 
+```php
+$field->getStep(); // Returns 1
+```
+
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the range field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+$errors = $field->validate(5); // Returns array of errors
+```
 
 ### SelectField
 
@@ -1085,67 +1173,83 @@ Validates the range field value.
 
 Constructor for the SelectField class.
 
-- **Parameters:**
-  - `string $name`: The name of the field.
-  - `string $label`: The label of the field.
-  - `bool $multipleSelection`: Whether multiple selection is allowed.
+```php
+use MulerTech\MTerm\Form\SelectField;
+
+$field = new SelectField('country', 'Country');
+```
 
 #### `setOptions(array $options): self`
 
 Sets the options for the select field.
 
-- **Parameters:**
-  - `array $options`: The options for the select field.
+```php
+$field->setOptions(['USA', 'Canada', 'UK']);
+```
 
 #### `setMultipleSelection(bool $multipleSelection = true): self`
 
 Sets whether multiple selection is allowed.
 
-- **Parameters:**
-  - `bool $multipleSelection`: Whether multiple selection is allowed.
+```php
+$field->setMultipleSelection(false);
+```
 
 #### `isMultipleSelection(): bool`
 
 Checks if multiple selection is allowed.
 
+```php
+$field->isMultipleSelection(); // Returns false
+```
+
 #### `parseInput(string $input): string`
 
 Parses the user input.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->parseInput('USA'); // Returns parsed value
+```
 
 #### `processInput(string $input = ''): string|array`
 
 Processes the user input for the select field.
 
-- **Parameters:**
-  - `string $input`: The raw input from the user.
+```php
+$value = $field->processInput('USA'); // Returns processed value
+```
 
 #### `renderSelectMultipleField(Terminal $terminal): array`
 
 Renders the select field for multiple selection.
 
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
+```php
+$options = $field->renderSelectMultipleField(new Terminal()); // Returns array of options
+```
 
 #### `renderSelectSingleField(Terminal $terminal): string`
 
 Renders the select field for single selection.
 
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
+```php
+$option = $field->renderSelectSingleField(new Terminal()); // Returns selected option
+```
 
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the select field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+$errors = $field->validate('USA'); // Returns array of errors
+```
 
 #### `getCurrentOption(): string`
 
 Returns the current selected option.
+
+```php
+$field->getCurrentOption(); // Returns 'USA'
+```
 
 ### TextField
 
@@ -1153,22 +1257,28 @@ Returns the current selected option.
 
 Sets the minimum length for the text field.
 
-- **Parameters:**
-  - `int $minLength`: The minimum length.
+```php
+use MulerTech\MTerm\Form\TextField;
+
+$field = new TextField('username', 'Username');
+$field->setMinLength(3);
+```
 
 #### `setMaxLength(?int $maxLength): self`
 
 Sets the maximum length for the text field.
 
-- **Parameters:**
-  - `?int $maxLength`: The maximum length.
+```php
+$field->setMaxLength(20);
+```
 
 #### `validate(string|int|float|array|null $value): array`
 
 Validates the text field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+$errors = $field->validate('guest'); // Returns array of errors
+```
 
 ### UrlField
 
@@ -1176,8 +1286,12 @@ Validates the text field value.
 
 Validates the URL field value.
 
-- **Parameters:**
-  - `string|int|float|array|null $value`: The value to validate.
+```php
+use MulerTech\MTerm\Form\UrlField;
+
+$field = new UrlField('website', 'Website');
+$errors = $field->validate('https://example.com'); // Returns array of errors
+```
 
 ### Form
 
@@ -1185,38 +1299,63 @@ Validates the URL field value.
 
 Constructor for the Form class.
 
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
+```php
+use MulerTech\MTerm\Core\Terminal;
+use MulerTech\MTerm\Form\Form;
+
+$form = new Form(new Terminal());
+```
 
 #### `addField(FieldInterface $field): self`
 
 Adds a field to the form.
 
-- **Parameters:**
-  - `FieldInterface $field`: The field to add.
+```php
+use MulerTech\MTerm\Form\TextField;
+
+$field = new TextField('username', 'Username');
+$form->addField($field);
+```
 
 #### `handle(): void`
 
 Handles the form submission.
 
+```php
+$form->handle();
+```
+
 #### `isSubmitted(): bool`
 
 Checks if the form has been submitted.
+
+```php
+$form->isSubmitted(); // Returns true or false
+```
 
 #### `isValid(): bool`
 
 Checks if the form is valid.
 
+```php
+$form->isValid(); // Returns true or false
+```
+
 #### `getValues(): array`
 
 Returns all form values.
+
+```php
+$values = $form->getValues(); // Returns array of values
+```
 
 #### `getValue(string $fieldName): string|int|float|array|null`
 
 Returns a specific form value.
 
-- **Parameters:**
-  - `string $fieldName`: The name of the field.
+```php
+$value = $form->getValue('username'); // Returns value of 'username' field
+```
 
 ### FormRenderer
 
@@ -1224,26 +1363,39 @@ Returns a specific form value.
 
 Constructor for the FormRenderer class.
 
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
+```php
+use MulerTech\MTerm\Core\Terminal;
+use MulerTech\MTerm\Form\FormRenderer;
+
+$renderer = new FormRenderer(new Terminal());
+```
 
 #### `renderField(FieldInterface $field): string|array`
 
 Renders a field.
 
-- **Parameters:**
-  - `FieldInterface $field`: The field to render.
+```php
+use MulerTech\MTerm\Form\TextField;
+
+$field = new TextField('username', 'Username');
+$output = $renderer->renderField($field); // Returns rendered field
+```
 
 #### `renderErrors(array $errors): void`
 
 Renders the errors.
 
-- **Parameters:**
-  - `array $errors`: The errors to render.
+```php
+$renderer->renderErrors(['Error 1', 'Error 2']);
+```
 
 #### `clear(): void`
 
 Clears the terminal screen.
+
+```php
+$renderer->clear();
+```
 
 ### ValidatorInterface
 
@@ -1251,8 +1403,17 @@ Clears the terminal screen.
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+use MulerTech\MTerm\Validator\ValidatorInterface;
+
+class CustomValidator implements ValidatorInterface
+{
+    public function validate($value): ?string
+    {
+        return $value === 'valid' ? null : 'Invalid value';
+    }
+}
+```
 
 ### AbstractValidator
 
@@ -1260,12 +1421,31 @@ Validates a value.
 
 Constructor for the AbstractValidator class.
 
-- **Parameters:**
-  - `string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\AbstractValidator;
+
+class CustomValidator extends AbstractValidator
+{
+    public function __construct()
+    {
+        parent::__construct('Invalid value');
+    }
+    
+    public function validate($value): ?string
+    {
+        return $value === 'valid' ? null : $this->getErrorMessage();
+    }
+}
+```
 
 #### `getErrorMessage(): string`
 
 Returns the error message.
+
+```php
+$validator = new CustomValidator();
+$errorMessage = $validator->getErrorMessage(); // Returns 'Invalid value'
+```
 
 ### ChoiceValidator
 
@@ -1273,17 +1453,20 @@ Returns the error message.
 
 Constructor for the ChoiceValidator class.
 
-- **Parameters:**
-  - `array $choices`: The valid choices.
-  - `bool $strict`: Whether to use strict comparison.
-  - `string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\ChoiceValidator;
+
+$validator = new ChoiceValidator(['option1', 'option2']);
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('option1'); // Returns null (valid)
+$error = $validator->validate('invalid'); // Returns error message (invalid)
+```
 
 ### DateValidator
 
@@ -1291,18 +1474,20 @@ Validates a value.
 
 Constructor for the DateValidator class.
 
-- **Parameters:**
-  - `string $format`: The date format.
-  - `?DateTimeInterface $minDate`: The minimum date.
-  - `?DateTimeInterface $maxDate`: The maximum date.
-  - `?string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\DateValidator;
+
+$validator = new DateValidator('Y-m-d');
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('2022-01-01'); // Returns null (valid)
+$error = $validator->validate('invalid-date'); // Returns error message (invalid)
+```
 
 ### EmailValidator
 
@@ -1310,15 +1495,20 @@ Validates a value.
 
 Constructor for the EmailValidator class.
 
-- **Parameters:**
-  - `string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\EmailValidator;
+
+$validator = new EmailValidator();
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('user@example.com'); // Returns null (valid)
+$error = $validator->validate('invalid-email'); // Returns error message (invalid)
+```
 
 ### IpAddressValidator
 
@@ -1326,19 +1516,20 @@ Validates a value.
 
 Constructor for the IpAddressValidator class.
 
-- **Parameters:**
-  - `bool $allowIPv4`: Whether to allow IPv4 addresses.
-  - `bool $allowIPv6`: Whether to allow IPv6 addresses.
-  - `bool $allowPrivate`: Whether to allow private addresses.
-  - `bool $allowReserved`: Whether to allow reserved addresses.
-  - `string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\IpAddressValidator;
+
+$validator = new IpAddressValidator();
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('192.168.0.1'); // Returns null (valid)
+$error = $validator->validate('invalid-ip'); // Returns error message (invalid)
+```
 
 ### LengthValidator
 
@@ -1346,17 +1537,20 @@ Validates a value.
 
 Constructor for the LengthValidator class.
 
-- **Parameters:**
-  - `?int $min`: The minimum length.
-  - `?int $max`: The maximum length.
-  - `?string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\LengthValidator;
+
+$validator = new LengthValidator(3, 20);
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('valid'); // Returns null (valid)
+$error = $validator->validate(''); // Returns error message (invalid)
+```
 
 ### NotEmptyValidator
 
@@ -1364,15 +1558,20 @@ Validates a value.
 
 Constructor for the NotEmptyValidator class.
 
-- **Parameters:**
-  - `string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\NotEmptyValidator;
+
+$validator = new NotEmptyValidator();
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('valid'); // Returns null (valid)
+$error = $validator->validate(''); // Returns error message (invalid)
+```
 
 ### NumericRangeValidator
 
@@ -1380,17 +1579,20 @@ Validates a value.
 
 Constructor for the NumericRangeValidator class.
 
-- **Parameters:**
-  - `?float $min`: The minimum value.
-  - `?float $max`: The maximum value.
-  - `?string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\NumericRangeValidator;
+
+$validator = new NumericRangeValidator(1, 100);
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate(50); // Returns null (valid)
+$error = $validator->validate(200); // Returns error message (invalid)
+```
 
 ### PatternValidator
 
@@ -1398,16 +1600,20 @@ Validates a value.
 
 Constructor for the PatternValidator class.
 
-- **Parameters:**
-  - `string $pattern`: The pattern to match.
-  - `string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\PatternValidator;
+
+$validator = new PatternValidator('/^[a-z]+$/');
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('valid'); // Returns null (valid)
+$error = $validator->validate('123'); // Returns error message (invalid)
+```
 
 ### RegexValidator
 
@@ -1415,16 +1621,20 @@ Validates a value.
 
 Constructor for the RegexValidator class.
 
-- **Parameters:**
-  - `string $pattern`: The pattern to match.
-  - `string $errorMessage`: The error message.
+```php
+use MulerTech\MTerm\Validator\RegexValidator;
+
+$validator = new RegexValidator('/^[a-z]+$/');
+```
 
 #### `validate(mixed $value): ?string`
 
 Validates a value.
 
-- **Parameters:**
-  - `mixed $value`: The value to validate.
+```php
+$error = $validator->validate('valid'); // Returns null (valid)
+$error = $validator->validate('123'); // Returns error message (invalid)
+```
 
 ## Utils Classes
 
@@ -1434,35 +1644,45 @@ Validates a value.
 
 Constructor for the ProgressBar class.
 
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
-  - `int $total`: The total value.
-  - `int $width`: The width of the progress bar.
-  - `string $completeChar`: The character for completed progress.
-  - `string $incompleteChar`: The character for incomplete progress.
-  - `string $color`: The color of the progress bar.
+```php
+use MulerTech\MTerm\Core\Terminal;
+use MulerTech\MTerm\Utils\ProgressBar;
+
+$terminal = new Terminal();
+$progressBar = new ProgressBar($terminal, 100, 50, '=', '-', 'green');
+```
 
 #### `start(): void`
 
 Starts the progress bar.
 
+```php
+$progressBar->start();
+```
+
 #### `advance(int $step = 1): void`
 
 Advances the progress bar by a specific amount.
 
-- **Parameters:**
-  - `int $step`: The amount to advance.
+```php
+$progressBar->advance(10);
+```
 
 #### `setProgress(int $current): void`
 
 Sets the progress to a specific value.
 
-- **Parameters:**
-  - `int $current`: The new progress value.
+```php
+$progressBar->setProgress(50);
+```
 
 #### `finish(): void`
 
 Finishes the progress bar.
+
+```php
+$progressBar->finish();
+```
 
 ### TableFormatter
 
@@ -1470,17 +1690,25 @@ Finishes the progress bar.
 
 Constructor for the TableFormatter class.
 
-- **Parameters:**
-  - `Terminal $terminal`: The terminal instance.
-  - `string $headerColor`: The color of the header.
-  - `string $borderColor`: The color of the border.
-  - `string $cellColor`: The color of the cells.
-  - `int $padding`: The padding for the cells.
+```php
+use MulerTech\MTerm\Core\Terminal;
+use MulerTech\MTerm\Utils\TableFormatter;
+
+$terminal = new Terminal();
+$tableFormatter = new TableFormatter($terminal, 'green', 'blue', 'white', 1);
+```
 
 #### `renderTable(array $headers, array $rows): void`
 
 Formats and renders a table.
 
-- **Parameters:**
-  - `array $headers`: The table headers.
-  - `array $rows`: The table data rows.
+```php
+$headers = ['Name', 'Age', 'Country'];
+$rows = [
+    ['John', 25, 'USA'],
+    ['Jane', 30, 'Canada'],
+    ['Doe', 22, 'UK']
+];
+
+$tableFormatter->renderTable($headers, $rows);
+```
