@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742812110">
-  <project timestamp="1742812110">
+<coverage generated="1742822125">
+  <project timestamp="1742822125">
     <package name="MulerTech\MTerm\Command">
       <file name="/home/runner/work/mterm/mterm/src/Command/AbstractCommand.php">
         <class name="MulerTech\MTerm\Command\AbstractCommand" namespace="MulerTech\MTerm\Command">
