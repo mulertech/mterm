@@ -365,9 +365,6 @@ if ($result['stderr']) {
 Constructor for the AbstractField class.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-use MulerTech\MTerm\Form\AbstractField;
-
 $field = new AbstractField('username', 'Username');
 $field->setDescription('Enter your username');
 $field->setRequired(true);
@@ -452,8 +449,6 @@ $field->clearErrors();
 Adds a validator to the field.
 
 ```php
-use MulerTech\MTerm\Validator\NotEmptyValidator;
-
 $validator = new NotEmptyValidator();
 $field->addValidator($validator);
 ```
@@ -489,8 +484,6 @@ $field->setTerminal(new Terminal());
 Sets the checked value for the checkbox.
 
 ```php
-use MulerTech\MTerm\Form\CheckboxField;
-
 $field = new CheckboxField('accept_terms', 'Accept Terms');
 $field->setCheckedValue('yes');
 ```
@@ -518,8 +511,6 @@ $value = $field->processInput('yes'); // Returns 'yes'
 Validates the color field value.
 
 ```php
-use MulerTech\MTerm\Form\ColorField;
-
 $field = new ColorField('favorite_color', 'Favorite Color');
 $errors = $field->validate('red'); // Returns array of errors
 ```
@@ -531,8 +522,6 @@ $errors = $field->validate('red'); // Returns array of errors
 Sets the date format.
 
 ```php
-use MulerTech\MTerm\Form\DateField;
-
 $field = new DateField('birthdate', 'Birthdate');
 $field->setFormat('Y-m-d');
 ```
@@ -568,8 +557,6 @@ $errors = $field->validate('2022-01-01'); // Returns array of errors
 Validates the email field value.
 
 ```php
-use MulerTech\MTerm\Form\EmailField;
-
 $field = new EmailField('email', 'Email');
 $errors = $field->validate('user@example.com'); // Returns array of errors
 ```
@@ -631,8 +618,6 @@ Sets the terminal instance for the field.
 Sets the allowed file extensions.
 
 ```php
-use MulerTech\MTerm\Form\FileField;
-
 $field = new FileField('profile_picture', 'Profile Picture');
 $field->setAllowedExtensions(['jpg', 'png']);
 ```
@@ -668,8 +653,6 @@ $errors = $field->validate('path/to/file.jpg'); // Returns array of errors
 Sets the minimum value for the number field.
 
 ```php
-use MulerTech\MTerm\Form\NumberField;
-
 $field = new NumberField('age', 'Age');
 $field->setMin(18);
 ```
@@ -713,8 +696,6 @@ $errors = $field->validate('25'); // Returns array of errors
 Checks if the input should be masked.
 
 ```php
-use MulerTech\MTerm\Form\PasswordField;
-
 $field = new PasswordField('password', 'Password');
 $field->isMaskInput(); // Returns true
 ```
@@ -766,8 +747,6 @@ $value = $field->processInput('password'); // Returns processed value
 Constructor for the RadioField class.
 
 ```php
-use MulerTech\MTerm\Form\RadioField;
-
 $field = new RadioField('gender', 'Gender');
 ```
 
@@ -786,8 +765,6 @@ $field->setMultipleSelection(false);
 Constructor for the RangeField class.
 
 ```php
-use MulerTech\MTerm\Form\RangeField;
-
 $field = new RangeField('rating', 'Rating');
 ```
 
@@ -822,8 +799,6 @@ $errors = $field->validate(5); // Returns array of errors
 Constructor for the SelectField class.
 
 ```php
-use MulerTech\MTerm\Form\SelectField;
-
 $field = new SelectField('country', 'Country');
 ```
 
@@ -906,8 +881,6 @@ $field->getCurrentOption(); // Returns 'USA'
 Sets the minimum length for the text field.
 
 ```php
-use MulerTech\MTerm\Form\TextField;
-
 $field = new TextField('username', 'Username');
 $field->setMinLength(3);
 ```
@@ -935,8 +908,6 @@ $errors = $field->validate('guest'); // Returns array of errors
 Validates the URL field value.
 
 ```php
-use MulerTech\MTerm\Form\UrlField;
-
 $field = new UrlField('website', 'Website');
 $errors = $field->validate('https://example.com'); // Returns array of errors
 ```
@@ -948,9 +919,6 @@ $errors = $field->validate('https://example.com'); // Returns array of errors
 Constructor for the Form class.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-use MulerTech\MTerm\Form\Form;
-
 $form = new Form(new Terminal());
 ```
 
@@ -959,8 +927,6 @@ $form = new Form(new Terminal());
 Adds a field to the form.
 
 ```php
-use MulerTech\MTerm\Form\TextField;
-
 $field = new TextField('username', 'Username');
 $form->addField($field);
 ```
@@ -1012,9 +978,6 @@ $value = $form->getValue('username'); // Returns value of 'username' field
 Constructor for the FormRenderer class.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-use MulerTech\MTerm\Form\FormRenderer;
-
 $renderer = new FormRenderer(new Terminal());
 ```
 
@@ -1023,8 +986,6 @@ $renderer = new FormRenderer(new Terminal());
 Renders a field.
 
 ```php
-use MulerTech\MTerm\Form\TextField;
-
 $field = new TextField('username', 'Username');
 $output = $renderer->renderField($field); // Returns rendered field
 ```
@@ -1052,8 +1013,6 @@ $renderer->clear();
 Validates a value.
 
 ```php
-use MulerTech\MTerm\Validator\ValidatorInterface;
-
 class CustomValidator implements ValidatorInterface
 {
     public function validate($value): ?string
@@ -1070,8 +1029,6 @@ class CustomValidator implements ValidatorInterface
 Constructor for the AbstractValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\AbstractValidator;
-
 class CustomValidator extends AbstractValidator
 {
     public function __construct()
@@ -1102,8 +1059,6 @@ $errorMessage = $validator->getErrorMessage(); // Returns 'Invalid value'
 Constructor for the ChoiceValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\ChoiceValidator;
-
 $validator = new ChoiceValidator(['option1', 'option2']);
 ```
 
@@ -1123,8 +1078,6 @@ $error = $validator->validate('invalid'); // Returns error message (invalid)
 Constructor for the DateValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\DateValidator;
-
 $validator = new DateValidator('Y-m-d');
 ```
 
@@ -1144,8 +1097,6 @@ $error = $validator->validate('invalid-date'); // Returns error message (invalid
 Constructor for the EmailValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\EmailValidator;
-
 $validator = new EmailValidator();
 ```
 
@@ -1165,8 +1116,6 @@ $error = $validator->validate('invalid-email'); // Returns error message (invali
 Constructor for the IpAddressValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\IpAddressValidator;
-
 $validator = new IpAddressValidator();
 ```
 
@@ -1186,8 +1135,6 @@ $error = $validator->validate('invalid-ip'); // Returns error message (invalid)
 Constructor for the LengthValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\LengthValidator;
-
 $validator = new LengthValidator(3, 20);
 ```
 
@@ -1207,8 +1154,6 @@ $error = $validator->validate(''); // Returns error message (invalid)
 Constructor for the NotEmptyValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\NotEmptyValidator;
-
 $validator = new NotEmptyValidator();
 ```
 
@@ -1228,8 +1173,6 @@ $error = $validator->validate(''); // Returns error message (invalid)
 Constructor for the NumericRangeValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\NumericRangeValidator;
-
 $validator = new NumericRangeValidator(1, 100);
 ```
 
@@ -1249,8 +1192,6 @@ $error = $validator->validate(200); // Returns error message (invalid)
 Constructor for the PatternValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\PatternValidator;
-
 $validator = new PatternValidator('/^[a-z]+$/');
 ```
 
@@ -1270,8 +1211,6 @@ $error = $validator->validate('123'); // Returns error message (invalid)
 Constructor for the RegexValidator class.
 
 ```php
-use MulerTech\MTerm\Validator\RegexValidator;
-
 $validator = new RegexValidator('/^[a-z]+$/');
 ```
 
@@ -1293,9 +1232,6 @@ $error = $validator->validate('123'); // Returns error message (invalid)
 Constructor for the ProgressBar class.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-use MulerTech\MTerm\Utils\ProgressBar;
-
 $terminal = new Terminal();
 $progressBar = new ProgressBar($terminal, 100, 50, '=', '-', 'green');
 ```
@@ -1339,9 +1275,6 @@ $progressBar->finish();
 Constructor for the TableFormatter class.
 
 ```php
-use MulerTech\MTerm\Core\Terminal;
-use MulerTech\MTerm\Utils\TableFormatter;
-
 $terminal = new Terminal();
 $tableFormatter = new TableFormatter($terminal, 'green', 'blue', 'white', 1);
 ```
@@ -1360,3 +1293,4 @@ $rows = [
 
 $tableFormatter->renderTable($headers, $rows);
 ```
+
