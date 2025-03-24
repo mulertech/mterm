@@ -35,10 +35,6 @@ class FormRenderer
 
         $prompt = $this->buildPrompt($field);
 
-        if ($field->getDescription()) {
-            $this->terminal->writeLine($field->getDescription(), 'cyan');
-        }
-
         if ($field instanceof PasswordField && $field->isMaskInput()) {
             return $field->processInput();
         }
@@ -46,6 +42,10 @@ class FormRenderer
         if ($field instanceof SelectField) {
             $result = $field->processInput();
             return is_array($result) ? $result : (string)$result;
+        }
+
+        if ($field->getDescription()) {
+            $this->terminal->writeLine($field->getDescription(), 'cyan');
         }
 
         $value = $this->terminal->read($prompt);

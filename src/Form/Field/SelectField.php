@@ -220,16 +220,10 @@ class SelectField extends AbstractField
     {
         $sequence = $terminal->readChar() . $terminal->readChar();
 
-        if ($sequence === "[A") { // Up arrow
-            $terminal->clear();
-            $terminal->write($header, 'cyan');
-            $terminal->write($this->parseInput('up'));
-        } elseif ($sequence === "[B") { // Down arrow
-            $terminal->clear();
-            $terminal->write($header, 'cyan');
-            $terminal->write($header, 'cyan');
-            $terminal->write($this->parseInput('down'));
-        }
+        $terminal->clear();
+        $terminal->write($header, 'cyan');
+
+        $terminal->write($this->parseInput($sequence === "[A" ? 'up' : 'down'));
     }
 
     /**

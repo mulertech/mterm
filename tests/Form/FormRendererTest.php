@@ -127,7 +127,7 @@ class FormRendererTest extends TestCase
         $this->terminal->expects($this->once())->method('specialMode');
         $this->terminal->expects($this->exactly(5))->method('clear');
         $this->terminal
-            ->expects($this->exactly(10))
+            ->expects($this->exactly(8))
             ->method('write')
             ->withAnyParameters();
         $this->terminal->expects($this->once())->method('normalMode');
@@ -261,7 +261,6 @@ class FormRendererTest extends TestCase
         $field = $this->createMock(PasswordField::class);
         $field->expects($this->once())->method('clearErrors');
         $field->expects($this->once())->method('setTerminal')->with($this->terminal);
-        $field->expects($this->once())->method('getDescription')->willReturn(null);
         $field->expects($this->once())->method('isMaskInput')->willReturn(true);
         $field->expects($this->once())->method('processInput')->willReturn('test');
 
