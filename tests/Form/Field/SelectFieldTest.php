@@ -93,12 +93,48 @@ class SelectFieldTest extends TestCase
         $this->assertStringContainsString('required', $errors[0]);
     }
 
+    public function testSetDefaultBeforeOptions(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->field->setDefault('opt1');
+    }
+
+    public function testSetBadDefaultValues(): void
+    {
+        $this->field->setOptions([
+            'opt1' => 'Option 1',
+            'opt2' => 'Option 2',
+            'opt3' => 'Option 3'
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->field->setRequired(false)
+            ->setDefault(['opt2', 'opt3', 'opt4']);
+    }
+
+    public function testSetNumericDefaultValues(): void
+    {
+        $this->field->setOptions([
+            'opt1' => 'Option 1',
+            'opt2' => 'Option 2',
+            'opt3' => 'Option 3'
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->field->setRequired(false)
+            ->setDefault(55);
+    }
+
     public function testProcessInputWithoutTerminalSet(): void
     {
-        $field = new SelectField('password', 'Password');
-        $field->setDefault('secret');
+        $field = new SelectField('color', 'Select Color');
+        $field->setOptions([
+            'red' => 'Red',
+            'green' => 'Green',
+            'blue' => 'Blue'
+        ])
+            ->setDefault('green');
         $this->expectException(RuntimeException::class);
         $field->processInput();
     }
-
 }

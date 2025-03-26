@@ -219,7 +219,7 @@ class FormRendererTest extends TestCase
                 'opt2' => 'Option 2',
                 'opt3' => 'Option 3',
             ])
-            ->setDefault(['opt2' => 'Option 2', 'opt3' => 'Option 3']);
+            ->setDefault(['opt2', 'opt3']);
 
         $form = new Form($this->terminal);
         $form->addField($field);
@@ -255,7 +255,10 @@ class FormRendererTest extends TestCase
         $this->assertEquals(['test_field' => 'test value'], $form->getValues());
     }
 
-    // Verify that terminal is correctly passed to fields
+    /**
+     * Verify that terminal is correctly passed to fields
+     * @throws Exception
+     */
     public function testTerminalInjection(): void
     {
         $field = $this->createMock(PasswordField::class);

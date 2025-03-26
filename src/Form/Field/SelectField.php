@@ -3,6 +3,8 @@
 namespace MulerTech\MTerm\Form\Field;
 
 use MulerTech\MTerm\Core\Terminal;
+use PHPUnit\Runner\InvalidPhptFileException;
+use RuntimeException;
 
 /**
  * Class SelectField
@@ -46,6 +48,21 @@ class SelectField extends AbstractField
     {
         $this->options = $options;
         return $this;
+    }
+
+    public function setDefault(float|array|int|string $defaultValue): AbstractField
+    {
+        if ($this->options === []) {
+            throw new RuntimeException('Options must be set before setting a default value');
+        }
+        if (is_numeric($defaultValue)) {
+            throw new RuntimeException('Default value must be a string or an array of strings');
+        }
+        $defaultValueArray = is_array($defaultValue) ? $defaultValue : [$defaultValue];
+        if (array_diff($defaultValueArray, array_keys($this->options)) !== []) {
+            throw new RuntimeException('Default value must be one or multiple of the options');
+        }
+        return parent::setDefault($defaultValueArray);
     }
 
     /**
@@ -113,7 +130,7 @@ class SelectField extends AbstractField
         $terminal = $this->terminal;
 
         if ($terminal === null) {
-            throw new \RuntimeException('Terminal must be set before calling processInput');
+            throw new RuntimeException('Terminal must be set before calling processInput');
         }
 
         $this->clearErrors();
@@ -138,12 +155,12 @@ class SelectField extends AbstractField
             return $this->selectedOptions;
         }
 
-        $defaultValue = $this->getDefault() ?? [];
-
-        return is_array($defaultValue) ? $defaultValue : [];
+        assert(is_array($this->getDefault()));
+        return !empty($this->getDefault()) ? array_intersect_key($this->options, array_flip($this->getDefault())) : [];
     }
 
     /**
+     * @param Terminal $terminal
      * @return string
      */
     public function renderSelectSingleField(Terminal $terminal): string
@@ -159,6 +176,7 @@ class SelectField extends AbstractField
     }
 
     /**
+     * @param Terminal $terminal
      * @return bool
      */
     private function handleSelectField(Terminal $terminal): bool
@@ -182,6 +200,7 @@ class SelectField extends AbstractField
 
     /**
      * @param string $header
+     * @param Terminal $terminal
      * @return bool
      */
     private function handleSelectKeyboardInput(string $header, Terminal $terminal): bool
@@ -214,6 +233,7 @@ class SelectField extends AbstractField
 
     /**
      * @param string $header
+     * @param Terminal $terminal
      * @return void
      */
     private function handleArrowKey(string $header, Terminal $terminal): void
