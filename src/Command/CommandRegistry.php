@@ -3,6 +3,7 @@
 namespace MulerTech\MTerm\Command;
 
 use InvalidArgumentException;
+use MulerTech\MTerm\Core\Terminal;
 
 /**
  * Class CommandRegistry
@@ -24,6 +25,11 @@ class CommandRegistry
      */
     public function register(CommandInterface $command): self
     {
+        if (!$this->has('help')) {
+            // Ensure help command is always registered
+            $this->commands['help'] = new HelpCommand(new Terminal(), $this);
+        }
+
         $this->commands[$command->getName()] = $command;
         return $this;
     }
@@ -73,7 +79,7 @@ class CommandRegistry
         $command = $this->get($name);
 
         if ($command === null) {
-            throw new InvalidArgumentException("Command '{$name}' not found");
+            throw new InvalidArgumentException("Command '$name' not found");
         }
 
         return $command->execute($args);

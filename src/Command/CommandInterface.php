@@ -24,6 +24,13 @@ interface CommandInterface
     public function getDescription(): string;
 
     /**
+     * Display help information for this command
+     *
+     * @return void
+     */
+    public function showHelp(): void;
+
+    /**
      * Execute the command
      *
      * @param array<int, mixed> $args Command arguments

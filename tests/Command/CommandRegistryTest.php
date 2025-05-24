@@ -5,6 +5,8 @@ namespace MulerTech\MTerm\Tests\Command;
 use InvalidArgumentException;
 use MulerTech\MTerm\Command\CommandInterface;
 use MulerTech\MTerm\Command\CommandRegistry;
+use MulerTech\MTerm\Command\HelpCommand;
+use MulerTech\MTerm\Core\Terminal;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -75,7 +77,7 @@ class CommandRegistryTest extends TestCase
 
         $commands = $this->registry->getAll();
 
-        $this->assertCount(2, $commands);
+        $this->assertCount(3, $commands);
         $this->assertSame($command1, $commands['command-1']);
         $this->assertSame($command2, $commands['command-2']);
     }
@@ -104,5 +106,114 @@ class CommandRegistryTest extends TestCase
         $this->expectExceptionMessage("Command 'non-existent' not found");
 
         $this->registry->execute('non-existent');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testHelpCommandConstructorSetsNameAndDescription(): void
+    {
+        $terminal = $this->createMock(Terminal::class);
+        $registry = new CommandRegistry();
+        
+        $helpCommand = new HelpCommand($terminal, $registry);
+        
+        $this->assertEquals('help', $helpCommand->getName());
+        $this->assertEquals('Display help information about available commands', $helpCommand->getDescription());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testHelpCommandShowAllCommands(): void
+    {
+        $terminal = $this->createMock(Terminal::class);
+        $registry = new CommandRegistry();
+        
+        // Mock commands for testing
+        $command1 = $this->createMock(CommandInterface::class);
+        $command1->method('getName')->willReturn('command1');
+        $command1->method('getDescription')->willReturn('Command 1 description');
+        
+        $command2 = $this->createMock(CommandInterface::class);
+        $command2->method('getName')->willReturn('command2');
+        $command2->method('getDescription')->willReturn('Command 2 description');
+        $command2->method('showHelp');
+        
+        $registry->register($command1);
+        $registry->register($command2);
+        
+        // Terminal expectations
+        $terminal->expects($this->exactly(8))
+            ->method('writeLine');
+            
+        $terminal->expects($this->exactly(3))
+            ->method('write');
+        
+        $helpCommand = new HelpCommand($terminal, $registry);
+        $result = $helpCommand->execute();
+        
+        $this->assertEquals(0, $result);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testHelpCommandShowSpecificCommandHelp(): void
+    {
+        $terminal = $this->createMock(Terminal::class);
+        $registry = new CommandRegistry();
+        
+        $testCommand = $this->createMock(CommandInterface::class);
+        $testCommand->method('getName')->willReturn('test');
+        $testCommand->method('getDescription')->willReturn('Test command description');
+        
+        $registry->register($testCommand);
+        
+        // Terminal expectations for successful command help
+        $terminal->expects($this->exactly(6))
+            ->method('writeLine');
+            
+        $helpCommand = new HelpCommand($terminal, $registry);
+        $result = $helpCommand->execute(['test']);
+        
+        $this->assertEquals(0, $result);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testHelpCommandShowNonExistentCommandHelp(): void
+    {
+        $terminal = $this->createMock(Terminal::class);
+        $registry = new CommandRegistry();
+        
+        // Terminal expectations for non-existent command
+        $terminal->expects($this->once())
+            ->method('writeLine')
+            ->with("Command 'non-existent' not found", 'red');
+        
+        $helpCommand = new HelpCommand($terminal, $registry);
+        $result = $helpCommand->execute(['non-existent']);
+        
+        $this->assertEquals(1, $result);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testHelpCommandIsAutoRegistered(): void
+    {
+        $registry = new CommandRegistry();
+        
+        // Register any command to trigger help auto-registration
+        $command = $this->createMock(CommandInterface::class);
+        $command->method('getName')->willReturn('test-command');
+        $registry->register($command);
+        
+        // Verify help command is registered
+        $this->assertTrue($registry->has('help'));
+        $helpCommand = $registry->get('help');
+        $this->assertInstanceOf(HelpCommand::class, $helpCommand);
     }
 }
