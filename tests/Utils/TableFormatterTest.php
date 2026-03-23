@@ -42,7 +42,7 @@ class TableFormatterTest extends TestCase
      */
     public function testCalculateColumnWidths(): void
     {
-        $mockTerminal = $this->createMock(Terminal::class);
+        $mockTerminal = $this->createStub(Terminal::class);
         $tableFormatter = new TableFormatter($mockTerminal);
 
         $reflection = new ReflectionClass($tableFormatter);

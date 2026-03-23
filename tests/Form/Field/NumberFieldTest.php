@@ -131,7 +131,6 @@ class NumberFieldTest extends TestCase
     {
         $this->field->setRequired(false);
         $errors = $this->field->validate('');
-        var_dump($errors);
         $this->assertEmpty($errors);
 
         $this->field->setRequired();

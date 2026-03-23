@@ -20,7 +20,7 @@ class FormTest extends TestCase
      */
     protected function setUp(): void
     {
-        $terminal = $this->createMock(Terminal::class);
+        $terminal = $this->createStub(Terminal::class);
         $this->form = new Form($terminal);
     }
 
@@ -30,13 +30,13 @@ class FormTest extends TestCase
      */
     public function testSubmittedFormWithValidFieldsIsValid(): void
     {
-        $field = $this->createMock(FieldInterface::class);
+        $field = $this->createStub(FieldInterface::class);
         $field->method('getName')->willReturn('name');
         $field->method('validate')->willReturn([]);
 
         $this->form->addField($field);
 
-        $formRenderer = $this->createMock(FormRenderer::class);
+        $formRenderer = $this->createStub(FormRenderer::class);
         $formRenderer->method('renderField')->willReturn('John Doe');
 
         $reflection = new ReflectionProperty($this->form, 'renderer');

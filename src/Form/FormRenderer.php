@@ -8,24 +8,20 @@ use MulerTech\MTerm\Form\Field\PasswordField;
 use MulerTech\MTerm\Form\Field\SelectField;
 
 /**
- * Class FormRenderer
- * @package MulerTech\MTerm
+ * Class FormRenderer.
+ *
  * @author Sébastien Muler
  */
 class FormRenderer
 {
     private Terminal $terminal;
 
-    /**
-     * @param Terminal $terminal
-     */
     public function __construct(Terminal $terminal)
     {
         $this->terminal = $terminal;
     }
 
     /**
-     * @param FieldInterface $field
      * @return string|array<int|string, string>
      */
     public function renderField(FieldInterface $field): string|array
@@ -41,7 +37,8 @@ class FormRenderer
 
         if ($field instanceof SelectField) {
             $result = $field->processInput();
-            return is_array($result) ? $result : (string)$result;
+
+            return is_array($result) ? $result : (string) $result;
         }
 
         if ($field->getDescription()) {
@@ -51,12 +48,11 @@ class FormRenderer
         $value = $this->terminal->read($prompt);
         $result = $field->processInput($value);
 
-        return is_array($result) ? $result : (string)$result;
+        return is_array($result) ? $result : (string) $result;
     }
 
     /**
      * @param array<string> $errors
-     * @return void
      */
     public function renderErrors(array $errors): void
     {
@@ -67,22 +63,16 @@ class FormRenderer
         }
     }
 
-    /**
-     * @return void
-     */
     public function clear(): void
     {
         $this->terminal->clear();
     }
 
-    /**
-     * @param FieldInterface $field
-     * @return string
-     */
     private function buildPrompt(FieldInterface $field): string
     {
         $label = $field->getLabel();
         $required = $field->isRequired() ? ' (required)' : '';
+
         return "$label$required: ";
     }
 }

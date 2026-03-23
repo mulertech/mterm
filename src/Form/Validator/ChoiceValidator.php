@@ -3,8 +3,8 @@
 namespace MulerTech\MTerm\Form\Validator;
 
 /**
- * Class ChoiceValidator
- * @package MulerTech\MTerm
+ * Class ChoiceValidator.
+ *
  * @author Sébastien Muler
  */
 class ChoiceValidator extends AbstractValidator
@@ -17,26 +17,20 @@ class ChoiceValidator extends AbstractValidator
 
     /**
      * @param array<int|string, mixed> $choices
-     * @param bool $strict
-     * @param string $errorMessage
      */
     public function __construct(
         array $choices,
         bool $strict = true,
-        string $errorMessage = "Selected value is not a valid choice."
+        string $errorMessage = 'Selected value is not a valid choice.',
     ) {
         $this->choices = $choices;
         $this->strict = $strict;
         parent::__construct($errorMessage);
     }
 
-    /**
-     * @param mixed $value
-     * @return string|null
-     */
     public function validate(mixed $value): ?string
     {
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return null;
         }
 

@@ -2,26 +2,24 @@
 
 namespace MulerTech\MTerm\Command;
 
-use InvalidArgumentException;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
- * Class CommandRegistry
- * @package MulerTech\MTerm
+ * Class CommandRegistry.
+ *
  * @author Sébastien Muler
  */
 class CommandRegistry
 {
     /**
-     * @var array<string,CommandInterface> $commands Registered commands
+     * @var array<string,CommandInterface> Registered commands
      */
     private array $commands = [];
 
     /**
-     * Register a command
+     * Register a command.
      *
      * @param CommandInterface $command Command to register
-     * @return self
      */
     public function register(CommandInterface $command): self
     {
@@ -31,14 +29,14 @@ class CommandRegistry
         }
 
         $this->commands[$command->getName()] = $command;
+
         return $this;
     }
 
     /**
-     * Check if a command exists by name
+     * Check if a command exists by name.
      *
      * @param string $name Command name
-     * @return bool
      */
     public function has(string $name): bool
     {
@@ -46,9 +44,10 @@ class CommandRegistry
     }
 
     /**
-     * Get a command by name
+     * Get a command by name.
      *
      * @param string $name Command name
+     *
      * @return CommandInterface|null Command or null if not found
      */
     public function get(string $name): ?CommandInterface
@@ -57,7 +56,7 @@ class CommandRegistry
     }
 
     /**
-     * Get all registered commands
+     * Get all registered commands.
      *
      * @return array<string,CommandInterface>
      */
@@ -67,19 +66,21 @@ class CommandRegistry
     }
 
     /**
-     * Execute a command by name with arguments
+     * Execute a command by name with arguments.
      *
-     * @param string $name Command name
+     * @param string            $name Command name
      * @param array<int, mixed> $args Command arguments
+     *
      * @return int Exit code
-     * @throws InvalidArgumentException When command doesn't exist
+     *
+     * @throws \InvalidArgumentException When command doesn't exist
      */
     public function execute(string $name, array $args = []): int
     {
         $command = $this->get($name);
 
-        if ($command === null) {
-            throw new InvalidArgumentException("Command '$name' not found");
+        if (null === $command) {
+            throw new \InvalidArgumentException("Command '$name' not found");
         }
 
         return $command->execute($args);

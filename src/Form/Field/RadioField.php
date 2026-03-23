@@ -3,16 +3,12 @@
 namespace MulerTech\MTerm\Form\Field;
 
 /**
- * Class RadioField
- * @package MulerTech\MTerm
+ * Class RadioField.
+ *
  * @author Sébastien Muler
  */
 class RadioField extends SelectField
 {
-    /**
-     * @param string $name
-     * @param string $label
-     */
     public function __construct(string $name, string $label)
     {
         parent::__construct($name, $label);
@@ -20,7 +16,6 @@ class RadioField extends SelectField
     }
 
     /**
-     * @param bool $multipleSelection
      * @return $this
      */
     public function setMultipleSelection(bool $multipleSelection = true): self

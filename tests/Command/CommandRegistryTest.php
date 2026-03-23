@@ -24,7 +24,7 @@ class CommandRegistryTest extends TestCase
      */
     public function testRegisterAddsCommandAndReturnsSelf(): void
     {
-        $command = $this->createMock(CommandInterface::class);
+        $command = $this->createStub(CommandInterface::class);
         $command->method('getName')->willReturn('test-command');
 
         $result = $this->registry->register($command);
@@ -38,7 +38,7 @@ class CommandRegistryTest extends TestCase
      */
     public function testHasReturnsTrueForRegisteredCommand(): void
     {
-        $command = $this->createMock(CommandInterface::class);
+        $command = $this->createStub(CommandInterface::class);
         $command->method('getName')->willReturn('test-command');
 
         $this->registry->register($command);
@@ -52,7 +52,7 @@ class CommandRegistryTest extends TestCase
      */
     public function testGetReturnsCorrectCommandForRegisteredName(): void
     {
-        $command = $this->createMock(CommandInterface::class);
+        $command = $this->createStub(CommandInterface::class);
         $command->method('getName')->willReturn('test-command');
 
         $this->registry->register($command);
@@ -66,10 +66,10 @@ class CommandRegistryTest extends TestCase
      */
     public function testGetAllReturnsAllRegisteredCommands(): void
     {
-        $command1 = $this->createMock(CommandInterface::class);
+        $command1 = $this->createStub(CommandInterface::class);
         $command1->method('getName')->willReturn('command-1');
 
-        $command2 = $this->createMock(CommandInterface::class);
+        $command2 = $this->createStub(CommandInterface::class);
         $command2->method('getName')->willReturn('command-2');
 
         $this->registry->register($command1);
@@ -113,7 +113,7 @@ class CommandRegistryTest extends TestCase
      */
     public function testHelpCommandConstructorSetsNameAndDescription(): void
     {
-        $terminal = $this->createMock(Terminal::class);
+        $terminal = $this->createStub(Terminal::class);
         $registry = new CommandRegistry();
         
         $helpCommand = new HelpCommand($terminal, $registry);
@@ -131,11 +131,11 @@ class CommandRegistryTest extends TestCase
         $registry = new CommandRegistry();
         
         // Mock commands for testing
-        $command1 = $this->createMock(CommandInterface::class);
+        $command1 = $this->createStub(CommandInterface::class);
         $command1->method('getName')->willReturn('command1');
         $command1->method('getDescription')->willReturn('Command 1 description');
-        
-        $command2 = $this->createMock(CommandInterface::class);
+
+        $command2 = $this->createStub(CommandInterface::class);
         $command2->method('getName')->willReturn('command2');
         $command2->method('getDescription')->willReturn('Command 2 description');
         $command2->method('showHelp');
@@ -164,7 +164,7 @@ class CommandRegistryTest extends TestCase
         $terminal = $this->createMock(Terminal::class);
         $registry = new CommandRegistry();
         
-        $testCommand = $this->createMock(CommandInterface::class);
+        $testCommand = $this->createStub(CommandInterface::class);
         $testCommand->method('getName')->willReturn('test');
         $testCommand->method('getDescription')->willReturn('Test command description');
         
@@ -207,7 +207,7 @@ class CommandRegistryTest extends TestCase
         $registry = new CommandRegistry();
         
         // Register any command to trigger help auto-registration
-        $command = $this->createMock(CommandInterface::class);
+        $command = $this->createStub(CommandInterface::class);
         $command->method('getName')->willReturn('test-command');
         $registry->register($command);
         

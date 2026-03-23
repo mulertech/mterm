@@ -5,8 +5,8 @@ namespace MulerTech\MTerm\Command;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
- * Abstract command class
- * @package MulerTech\MTerm
+ * Abstract command class.
+ *
  * @author Sébastien Muler
  */
 abstract class AbstractCommand implements CommandInterface
@@ -15,36 +15,26 @@ abstract class AbstractCommand implements CommandInterface
     protected string $name;
     protected string $description;
 
-    /**
-     * @param Terminal $terminal
-     */
     public function __construct(Terminal $terminal)
     {
         $this->terminal = $terminal;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
     /**
-     * Display help information for this command
-     * @return void
+     * Display help information for this command.
      */
     public function showHelp(): void
     {
-        $this->terminal->writeLine($this->getName() . ": " . $this->getDescription(), "cyan");
+        $this->terminal->writeLine($this->getName().': '.$this->getDescription(), 'cyan');
     }
 }

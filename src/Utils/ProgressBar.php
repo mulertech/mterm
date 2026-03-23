@@ -5,8 +5,8 @@ namespace MulerTech\MTerm\Utils;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
- * Class ProgressBar
- * @package MulerTech\MTerm
+ * Class ProgressBar.
+ *
  * @author Sébastien Muler
  */
 class ProgressBar
@@ -20,21 +20,13 @@ class ProgressBar
     private string $color;
     private ?float $startTime = null;
 
-    /**
-     * @param Terminal $terminal
-     * @param int $total
-     * @param int $width
-     * @param string $completeChar
-     * @param string $incompleteChar
-     * @param string $color
-     */
     public function __construct(
         Terminal $terminal,
         int $total = 100,
         int $width = 50,
         string $completeChar = '=',
         string $incompleteChar = '-',
-        string $color = Terminal::COLORS['green']
+        string $color = Terminal::COLORS['green'],
     ) {
         $this->terminal = $terminal;
         $this->total = $total;
@@ -46,9 +38,7 @@ class ProgressBar
     }
 
     /**
-     * Start the progress bar
-     *
-     * @return void
+     * Start the progress bar.
      */
     public function start(): void
     {
@@ -58,10 +48,9 @@ class ProgressBar
     }
 
     /**
-     * Advance the progress bar by a specific amount
+     * Advance the progress bar by a specific amount.
      *
      * @param int $step Amount to advance
-     * @return void
      */
     public function advance(int $step = 1): void
     {
@@ -73,10 +62,9 @@ class ProgressBar
     }
 
     /**
-     * Set the progress to a specific value
+     * Set the progress to a specific value.
      *
      * @param int $current New progress value
-     * @return void
      */
     public function setProgress(int $current): void
     {
@@ -85,9 +73,7 @@ class ProgressBar
     }
 
     /**
-     * Finish the progress bar
-     *
-     * @return void
+     * Finish the progress bar.
      */
     public function finish(): void
     {
@@ -97,20 +83,18 @@ class ProgressBar
     }
 
     /**
-     * Draw the progress bar
-     *
-     * @return void
+     * Draw the progress bar.
      */
     private function draw(): void
     {
         $percent = $this->total > 0 ? floor(($this->current / $this->total) * 100) : 0;
         $filledWidth = $this->total > 0 ? floor(($this->current / $this->total) * $this->width) : 0;
 
-        $bar = str_repeat($this->completeChar, (int)$filledWidth);
-        $bar .= str_repeat($this->incompleteChar, $this->width - (int)$filledWidth);
+        $bar = str_repeat($this->completeChar, (int) $filledWidth);
+        $bar .= str_repeat($this->incompleteChar, $this->width - (int) $filledWidth);
 
         $timeInfo = '';
-        if ($this->startTime !== null) {
+        if (null !== $this->startTime) {
             $elapsedTime = microtime(true) - $this->startTime;
             $timeInfo = sprintf(' %.1fs', $elapsedTime);
         }

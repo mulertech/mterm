@@ -18,7 +18,7 @@ class SelectFieldTest extends TestCase
      */
     protected function setUp(): void
     {
-        $terminal = $this->createMock(Terminal::class);
+        $terminal = $this->createStub(Terminal::class);
         $this->field = new SelectField('select', 'Select Field');
         $this->field->setTerminal($terminal);
     }

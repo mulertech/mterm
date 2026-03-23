@@ -5,21 +5,14 @@ namespace MulerTech\MTerm\Command;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
- * Help command to display available commands and usage information
- * @package MulerTech\MTerm
+ * Help command to display available commands and usage information.
+ *
  * @author Sébastien Muler
  */
 class HelpCommand extends AbstractCommand
 {
-    /**
-     * @var CommandRegistry
-     */
     private CommandRegistry $registry;
 
-    /**
-     * @param Terminal $terminal
-     * @param CommandRegistry $registry
-     */
     public function __construct(Terminal $terminal, CommandRegistry $registry)
     {
         parent::__construct($terminal);
@@ -30,11 +23,12 @@ class HelpCommand extends AbstractCommand
 
     /**
      * @param array<int, mixed> $args Command arguments
+     *
      * @return int Exit code (0 for success, other values for errors)
      */
     public function execute(array $args = []): int
     {
-        if (!empty($args) && isset($args[0])) {
+        if (!empty($args) && isset($args[0]) && is_string($args[0])) {
             return $this->showCommandHelp($args[0]);
         }
 
@@ -42,40 +36,36 @@ class HelpCommand extends AbstractCommand
     }
 
     /**
-     * Show help for a specific command
-     *
-     * @param string $commandName
-     * @return int
+     * Show help for a specific command.
      */
     private function showCommandHelp(string $commandName): int
     {
         $command = $this->registry->get($commandName);
 
-        if ($command === null) {
+        if (null === $command) {
             $this->terminal->writeLine("Command '{$commandName}' not found", 'red');
+
             return 1;
         }
 
-        $this->terminal->writeLine("COMMAND", 'green', true);
+        $this->terminal->writeLine('COMMAND', 'green', true);
         $this->terminal->writeLine("  {$command->getName()}", 'white');
-        $this->terminal->writeLine("");
-        $this->terminal->writeLine("DESCRIPTION", 'green', true);
+        $this->terminal->writeLine('');
+        $this->terminal->writeLine('DESCRIPTION', 'green', true);
         $this->terminal->writeLine("  {$command->getDescription()}", 'white');
-        $this->terminal->writeLine("");
+        $this->terminal->writeLine('');
         $command->showHelp();
 
         return 0;
     }
 
     /**
-     * Show all available commands
-     *
-     * @return int
+     * Show all available commands.
      */
     private function showAllCommands(): int
     {
-        $this->terminal->writeLine("Available Commands:", 'green', true);
-        $this->terminal->writeLine("");
+        $this->terminal->writeLine('Available Commands:', 'green', true);
+        $this->terminal->writeLine('');
 
         $commands = $this->registry->getAll();
         ksort($commands);
@@ -85,9 +75,9 @@ class HelpCommand extends AbstractCommand
             $this->terminal->writeLine(" - {$command->getDescription()}");
         }
 
-        $this->terminal->writeLine("");
-        $this->terminal->writeLine("For more information about a command, type:");
-        $this->terminal->writeLine("  help <command>", 'cyan');
+        $this->terminal->writeLine('');
+        $this->terminal->writeLine('For more information about a command, type:');
+        $this->terminal->writeLine('  help <command>', 'cyan');
 
         return 0;
     }

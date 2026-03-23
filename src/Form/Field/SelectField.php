@@ -3,18 +3,16 @@
 namespace MulerTech\MTerm\Form\Field;
 
 use MulerTech\MTerm\Core\Terminal;
-use PHPUnit\Runner\InvalidPhptFileException;
-use RuntimeException;
 
 /**
- * Class SelectField
- * @package MulerTech\MTerm
+ * Class SelectField.
+ *
  * @author Sébastien Muler
  */
 class SelectField extends AbstractField
 {
     /**
-     * @var array<int|string, string> $options
+     * @var array<int|string, string>
      */
     protected array $options = [];
     protected bool $multipleSelection = false;
@@ -24,15 +22,10 @@ class SelectField extends AbstractField
     protected string $cursorPresent = '*';
     private int $cursorPosition = 0;
     /**
-     * @var array<int|string, string> $selectedOptions
+     * @var array<int|string, string>
      */
     protected array $selectedOptions = [];
 
-    /**
-     * @param string $name
-     * @param string $label
-     * @param bool $multipleSelection
-     */
     public function __construct(string $name, string $label, bool $multipleSelection = false)
     {
         parent::__construct($name, $label);
@@ -42,68 +35,64 @@ class SelectField extends AbstractField
 
     /**
      * @param array<int|string, string> $options
+     *
      * @return $this
      */
     public function setOptions(array $options): self
     {
         $this->options = $options;
+
         return $this;
     }
 
     public function setDefault(float|array|int|string $defaultValue): AbstractField
     {
-        if ($this->options === []) {
-            throw new RuntimeException('Options must be set before setting a default value');
+        if ([] === $this->options) {
+            throw new \RuntimeException('Options must be set before setting a default value');
         }
         if (is_numeric($defaultValue)) {
-            throw new RuntimeException('Default value must be a string or an array of strings');
+            throw new \RuntimeException('Default value must be a string or an array of strings');
         }
         $defaultValueArray = is_array($defaultValue) ? $defaultValue : [$defaultValue];
-        if (array_diff($defaultValueArray, array_keys($this->options)) !== []) {
-            throw new RuntimeException('Default value must be one or multiple of the options');
+        if ([] !== array_diff($defaultValueArray, array_keys($this->options))) {
+            throw new \RuntimeException('Default value must be one or multiple of the options');
         }
+
         return parent::setDefault($defaultValueArray);
     }
 
     /**
-     * @param bool $multipleSelection
      * @return $this
      */
     public function setMultipleSelection(bool $multipleSelection = true): self
     {
         $this->multipleSelection = $multipleSelection;
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isMultipleSelection(): bool
     {
         return $this->multipleSelection;
     }
 
-    /**
-     * @param string $input
-     * @return string
-     */
     public function parseInput(string $input): string
     {
         // Generate the selected options
         if ($this->multipleSelection) {
             // Update the position of the cursor
-            if ($input === 'up') {
+            if ('up' === $input) {
                 $this->cursorPosition = max(0, $this->cursorPosition - 1);
-            } elseif ($input === 'down') {
+            } elseif ('down' === $input) {
                 $this->cursorPosition = min(count($this->options) - 1, $this->cursorPosition + 1);
-            } elseif ($input === 'space') {
+            } elseif ('space' === $input) {
                 $key = array_keys($this->options)[$this->cursorPosition];
                 if (isset($this->selectedOptions[$key])) {
                     unset($this->selectedOptions[$key]);
                 } else {
                     $this->selectedOptions[$key] = $this->options[$key];
                 }
-            } elseif ($input === 'a') {
+            } elseif ('a' === $input) {
                 $this->selectedOptions = $this->options;
             }
 
@@ -111,9 +100,9 @@ class SelectField extends AbstractField
         }
 
         // Update the position of the cursor
-        if ($input === 'up') {
+        if ('up' === $input) {
             $this->cursorPosition = max(0, $this->cursorPosition - 1);
-        } elseif ($input === 'down') {
+        } elseif ('down' === $input) {
             $this->cursorPosition = min(count($this->options) - 1, $this->cursorPosition + 1);
         }
 
@@ -121,7 +110,7 @@ class SelectField extends AbstractField
     }
 
     /**
-     * Process user input for this field
+     * Process user input for this field.
      *
      * @return string|array<int|string, string>
      */
@@ -129,8 +118,8 @@ class SelectField extends AbstractField
     {
         $terminal = $this->terminal;
 
-        if ($terminal === null) {
-            throw new RuntimeException('Terminal must be set before calling processInput');
+        if (null === $terminal) {
+            throw new \RuntimeException('Terminal must be set before calling processInput');
         }
 
         $this->clearErrors();
@@ -151,18 +140,15 @@ class SelectField extends AbstractField
 
         $result = $this->handleSelectField($terminal);
 
-        if ($result === true && $this->selectedOptions !== []) {
+        if (true === $result && [] !== $this->selectedOptions) {
             return $this->selectedOptions;
         }
 
         assert(is_array($this->getDefault()));
+
         return !empty($this->getDefault()) ? array_intersect_key($this->options, array_flip($this->getDefault())) : [];
     }
 
-    /**
-     * @param Terminal $terminal
-     * @return string
-     */
     public function renderSelectSingleField(Terminal $terminal): string
     {
         $this->clearErrors();
@@ -172,20 +158,16 @@ class SelectField extends AbstractField
         $defaultValue = $this->getDefault() ?? '';
         $defaultValue = is_string($defaultValue) ? $defaultValue : '';
 
-        return $result === true ? $this->getCurrentOption() : $defaultValue;
+        return true === $result ? $this->getCurrentOption() : $defaultValue;
     }
 
-    /**
-     * @param Terminal $terminal
-     * @return bool
-     */
     private function handleSelectField(Terminal $terminal): bool
     {
         $prompt = $this->buildPrompt();
-        $header = $prompt . PHP_EOL;
+        $header = $prompt.PHP_EOL;
 
-        if ($this->getDescription() !== null) {
-            $header .= $this->getDescription() . PHP_EOL;
+        if (null !== $this->getDescription()) {
+            $header .= $this->getDescription().PHP_EOL;
         }
 
         $terminal->specialMode();
@@ -195,35 +177,31 @@ class SelectField extends AbstractField
         $result = $this->handleSelectKeyboardInput($header, $terminal);
 
         $terminal->normalMode();
+
         return $result;
     }
 
-    /**
-     * @param string $header
-     * @param Terminal $terminal
-     * @return bool
-     */
     private function handleSelectKeyboardInput(string $header, Terminal $terminal): bool
     {
         while (true) {
             $char = $terminal->readChar();
 
-            if ($char === PHP_EOL) { // Enter key
+            if (PHP_EOL === $char) { // Enter key
                 return true;
             }
 
-            if ($char === "\033") {
+            if ("\033" === $char) {
                 $this->handleArrowKey($header, $terminal);
                 continue;
             }
 
-            if ($char === ' ') {
+            if (' ' === $char) {
                 $terminal->clear();
                 $terminal->write($header, 'cyan');
                 $terminal->write($this->parseInput('space'));
             }
 
-            if ($char === 'a') {
+            if ('a' === $char) {
                 $terminal->clear();
                 $terminal->write($header, 'cyan');
                 $terminal->write($this->parseInput('a'));
@@ -231,23 +209,19 @@ class SelectField extends AbstractField
         }
     }
 
-    /**
-     * @param string $header
-     * @param Terminal $terminal
-     * @return void
-     */
     private function handleArrowKey(string $header, Terminal $terminal): void
     {
-        $sequence = $terminal->readChar() . $terminal->readChar();
+        $sequence = $terminal->readChar().$terminal->readChar();
 
         $terminal->clear();
         $terminal->write($header, 'cyan');
 
-        $terminal->write($this->parseInput($sequence === "[A" ? 'up' : 'down'));
+        $terminal->write($this->parseInput('[A' === $sequence ? 'up' : 'down'));
     }
 
     /**
      * @param string|int|float|array<int|string, string>|null $value
+     *
      * @return array<string>
      */
     public function validate(string|int|float|array|null $value): array
@@ -276,31 +250,25 @@ class SelectField extends AbstractField
     }
 
     /**
-     * Get the current selected option key
-     *
-     * @return string
+     * Get the current selected option key.
      */
     public function getCurrentOption(): string
     {
         $options = array_keys($this->options);
-        return (string)($options[$this->cursorPosition] ?? '');
+
+        return (string) ($options[$this->cursorPosition] ?? '');
     }
 
-    /**
-     * @return string
-     */
     private function buildPrompt(): string
     {
         $label = $this->getLabel();
         $required = $this->isRequired() ? ' (required)' : '';
+
         return "$label$required: ";
     }
 
     /**
-     * Generate the select display
-     *
-     * @param bool $multiple
-     * @return string
+     * Generate the select display.
      */
     private function processSelect(bool $multiple = false): string
     {
@@ -314,7 +282,7 @@ class SelectField extends AbstractField
                 $selected .= ' ';
             }
             $cursor = ($position++ === $this->cursorPosition) ? $this->cursorPresent : $this->cursorAbsent;
-            $echo .= "$cursor $selected $value" . PHP_EOL;
+            $echo .= "$cursor $selected $value".PHP_EOL;
         }
 
         return $echo;

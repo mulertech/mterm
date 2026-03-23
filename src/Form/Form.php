@@ -4,11 +4,10 @@ namespace MulerTech\MTerm\Form;
 
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\FieldInterface;
-use MulerTech\MTerm\Form\Field\SelectField;
 
 /**
- * Class Form
- * @package MulerTech\MTerm
+ * Class Form.
+ *
  * @author Sébastien Muler
  */
 class Form
@@ -25,30 +24,25 @@ class Form
     private bool $isSubmitted = false;
     private bool $isValid = false;
 
-    /**
-     * @param Terminal $terminal
-     */
     public function __construct(Terminal $terminal)
     {
         $this->renderer = new FormRenderer($terminal);
     }
 
     /**
-     * Add a field to the form
+     * Add a field to the form.
      *
      * @param FieldInterface $field Field to add
-     * @return self
      */
     public function addField(FieldInterface $field): self
     {
         $this->fields[$field->getName()] = $field;
+
         return $this;
     }
 
     /**
-     * Handle form submission
-     *
-     * @return void
+     * Handle form submission.
      */
     public function handle(): void
     {
@@ -81,9 +75,7 @@ class Form
     }
 
     /**
-     * Check if the form has been submitted
-     *
-     * @return bool
+     * Check if the form has been submitted.
      */
     public function isSubmitted(): bool
     {
@@ -91,9 +83,7 @@ class Form
     }
 
     /**
-     * Check if the form is valid
-     *
-     * @return bool
+     * Check if the form is valid.
      */
     public function isValid(): bool
     {
@@ -101,7 +91,7 @@ class Form
     }
 
     /**
-     * Get all form values
+     * Get all form values.
      *
      * @return array<string, string|int|float|array<int|string, string>|null>
      */
@@ -111,9 +101,10 @@ class Form
     }
 
     /**
-     * Get a specific form value
+     * Get a specific form value.
      *
      * @param string $fieldName Field name
+     *
      * @return string|int|float|array<int|string, string>|null Field value or null if not found
      */
     public function getValue(string $fieldName): string|int|float|array|null

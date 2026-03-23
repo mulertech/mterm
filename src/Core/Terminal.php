@@ -3,8 +3,8 @@
 namespace MulerTech\MTerm\Core;
 
 /**
- * Class Terminal
- * @package MulerTech\MTerm
+ * Class Terminal.
+ *
  * @author Sébastien Muler
  */
 class Terminal
@@ -28,13 +28,9 @@ class Terminal
         'bold_white' => '1;37',
     ];
 
-    /**
-     * @param string|null $prompt
-     * @return string
-     */
     public function read(?string $prompt = null): string
     {
-        if ($prompt !== null) {
+        if (null !== $prompt) {
             $this->write($prompt);
         }
 
@@ -45,13 +41,9 @@ class Terminal
         return $line ? trim($line) : '';
     }
 
-    /**
-     * @param string|null $prompt
-     * @return string
-     */
     public function readChar(?string $prompt = null): string
     {
-        if ($prompt !== null) {
+        if (null !== $prompt) {
             $this->write($prompt);
         }
 
@@ -59,21 +51,19 @@ class Terminal
 
         $char = $resource ? fgetc($resource) : '';
 
-        return $char === false ? '' : $char;
+        return false === $char ? '' : $char;
     }
 
     /**
-     * @param string $text
-     * @param string|null $color
      * @param bool $bold Whether to make text bold
-     * @return void
      */
     public function write(string $text, ?string $color = null, bool $bold = false): void
     {
-        if ($color !== null && $this->supportsAnsi()) {
+        if (null !== $color && $this->supportsAnsi()) {
             $colorKey = $bold ? "bold_{$color}" : $color;
             if (isset(self::COLORS[$colorKey])) {
-                echo "\033[" . self::COLORS[$colorKey] . "m" . $text . "\033[0m";
+                echo "\033[".self::COLORS[$colorKey].'m'.$text."\033[0m";
+
                 return;
             }
         }
@@ -82,35 +72,23 @@ class Terminal
     }
 
     /**
-     * @param string $text
-     * @param string|null $color
      * @param bool $bold Whether to make text bold
-     * @return void
      */
     public function writeLine(string $text, ?string $color = null, bool $bold = false): void
     {
-        $this->write($text . PHP_EOL, $color, $bold);
+        $this->write($text.PHP_EOL, $color, $bold);
     }
 
-    /**
-     * @return void
-     */
     public function clear(): void
     {
         $this->system(DIRECTORY_SEPARATOR === '/' ? 'clear' : 'cls');
     }
 
-    /**
-     * @return void
-     */
     public function specialMode(): void
     {
         $this->system('stty -icanon -echo');
     }
 
-    /**
-     * @return void
-     */
     public function normalMode(): void
     {
         $this->system('stty icanon echo');
@@ -121,14 +99,11 @@ class Terminal
         system($command);
     }
 
-    /**
-     * @return bool
-     */
     public function supportsAnsi(): bool
     {
-        return DIRECTORY_SEPARATOR === '/' ||
-            (function_exists('sapi_windows_vt100_support') &&
-            @sapi_windows_vt100_support(STDOUT));
+        return DIRECTORY_SEPARATOR === '/'
+            || (function_exists('sapi_windows_vt100_support')
+            && @sapi_windows_vt100_support(STDOUT));
     }
 
     /**

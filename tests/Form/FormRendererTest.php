@@ -3,6 +3,7 @@
 namespace MulerTech\MTerm\Tests\Form;
 
 use MulerTech\MTerm\Core\Terminal;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use MulerTech\MTerm\Form\Field\PasswordField;
 use MulerTech\MTerm\Form\Field\SelectField;
 use MulerTech\MTerm\Form\Field\Template\SelectMultipleArrowTemplate;
@@ -259,6 +260,7 @@ class FormRendererTest extends TestCase
      * Verify that terminal is correctly passed to fields
      * @throws Exception
      */
+    #[AllowMockObjectsWithoutExpectations]
     public function testTerminalInjection(): void
     {
         $field = $this->createMock(PasswordField::class);

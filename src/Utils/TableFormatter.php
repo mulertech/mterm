@@ -5,8 +5,8 @@ namespace MulerTech\MTerm\Utils;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
- * Class TableFormatter
- * @package MulerTech\MTerm
+ * Class TableFormatter.
+ *
  * @author Sébastien Muler
  */
 class TableFormatter
@@ -17,19 +17,12 @@ class TableFormatter
     private string $cellColor;
     private int $padding;
 
-    /**
-     * @param Terminal $terminal
-     * @param string $headerColor
-     * @param string $borderColor
-     * @param string $cellColor
-     * @param int $padding
-     */
     public function __construct(
         Terminal $terminal,
         string $headerColor = Terminal::COLORS['green'],
         string $borderColor = Terminal::COLORS['blue'],
         string $cellColor = Terminal::COLORS['white'],
-        int $padding = 1
+        int $padding = 1,
     ) {
         $this->terminal = $terminal;
         $this->headerColor = $headerColor;
@@ -39,11 +32,10 @@ class TableFormatter
     }
 
     /**
-     * Format and terminal a table
+     * Format and terminal a table.
      *
-     * @param array<int|string, string> $headers Table headers
-     * @param array<int, array<int|string, string|int|float>> $rows Table data rows
-     * @return void
+     * @param array<int|string, string>                       $headers Table headers
+     * @param array<int, array<int|string, string|int|float>> $rows    Table data rows
      */
     public function renderTable(array $headers, array $rows): void
     {
@@ -61,10 +53,11 @@ class TableFormatter
     }
 
     /**
-     * Calculate the width of each column
+     * Calculate the width of each column.
      *
-     * @param array<int|string, string> $headers Table headers
-     * @param array<int, array<int|string, string|int|float>> $rows Table data rows
+     * @param array<int|string, string>                       $headers Table headers
+     * @param array<int, array<int|string, string|int|float>> $rows    Table data rows
+     *
      * @return array<int, int> Array of column widths
      */
     private function calculateColumnWidths(array $headers, array $rows): array
@@ -75,15 +68,15 @@ class TableFormatter
         // Utiliser des indices entiers explicites
         foreach ($headers as $header) {
             $widths[$i] = strlen($header);
-            $i++;
+            ++$i;
         }
 
         foreach ($rows as $row) {
             $i = 0;
             foreach ($row as $cell) {
-                $cellLength = strlen((string)$cell);
+                $cellLength = strlen((string) $cell);
                 $widths[$i] = max($widths[$i] ?? 0, $cellLength);
-                $i++;
+                ++$i;
             }
         }
 
@@ -92,28 +85,26 @@ class TableFormatter
     }
 
     /**
-     * Draw horizontal separator line
+     * Draw horizontal separator line.
      *
      * @param array<int, int> $columnWidths Array of column widths
-     * @return void
      */
     private function drawSeparator(array $columnWidths): void
     {
         $line = '+';
         foreach ($columnWidths as $width) {
-            $line .= str_repeat('-', $width) . '+';
+            $line .= str_repeat('-', $width).'+';
         }
         $this->terminal->writeLine($line, $this->borderColor);
     }
 
     /**
-     * Draw a table row
+     * Draw a table row.
      *
-     * @param array<int|string, string|int|float> $row Row data
-     * @param array<int, int> $columnWidths Array of column widths
-     * @param string $color Color for the row
-     * @param bool $bold Whether to make text bold
-     * @return void
+     * @param array<int|string, string|int|float> $row          Row data
+     * @param array<int, int>                     $columnWidths Array of column widths
+     * @param string                              $color        Color for the row
+     * @param bool                                $bold         Whether to make text bold
      */
     private function drawRow(array $row, array $columnWidths, string $color, bool $bold = false): void
     {
@@ -122,9 +113,9 @@ class TableFormatter
         foreach ($row as $cell) {
             $width = $columnWidths[$i] ?? 10;
             $padding = $this->padding;
-            $cellContent = str_pad((string)$cell, $width - $padding * 2, ' ');
-            $line .= str_repeat(' ', $padding) . $cellContent . str_repeat(' ', $padding) . '|';
-            $i++;
+            $cellContent = str_pad((string) $cell, $width - $padding * 2, ' ');
+            $line .= str_repeat(' ', $padding).$cellContent.str_repeat(' ', $padding).'|';
+            ++$i;
         }
 
         $this->terminal->write('|', $this->borderColor);

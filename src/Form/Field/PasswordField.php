@@ -2,11 +2,9 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
-use RuntimeException;
-
 /**
- * Class PasswordField
- * @package MulerTech\MTerm
+ * Class PasswordField.
+ *
  * @author Sébastien Muler
  */
 class PasswordField extends TextField
@@ -14,49 +12,39 @@ class PasswordField extends TextField
     private bool $maskInput = true;
     private string $maskChar = '*';
 
-    /**
-     * @return bool
-     */
     public function isMaskInput(): bool
     {
         return $this->maskInput;
     }
 
     /**
-     * @param bool $maskInput
      * @return $this
      */
     public function setMaskInput(bool $maskInput = true): self
     {
         $this->maskInput = $maskInput;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getMaskChar(): string
     {
         return $this->maskChar;
     }
 
     /**
-     * @param string $maskChar
      * @return $this
      */
     public function setMaskChar(string $maskChar): self
     {
         $this->maskChar = $maskChar;
+
         return $this;
     }
 
-    /**
-     * @param string $input
-     * @return string
-     */
     public function parseInput(string $input): string
     {
-        if ($input === '' && is_string($this->defaultValue)) {
+        if ('' === $input && is_string($this->defaultValue)) {
             return $this->defaultValue;
         }
 
@@ -64,22 +52,20 @@ class PasswordField extends TextField
     }
 
     /**
-     * Process the password input with masking
-     *
-     * @param string $input
-     * @return string
+     * Process the password input with masking.
      */
     public function processInput(string $input = ''): string
     {
         if (!$this->maskInput) {
             $result = parent::processInput($input);
+
             return is_string($result) ? $result : $input;
         }
 
         $terminal = $this->terminal;
 
-        if ($terminal === null) {
-            throw new RuntimeException('Terminal must be set before calling processInput');
+        if (null === $terminal) {
+            throw new \RuntimeException('Terminal must be set before calling processInput');
         }
 
         $this->clearErrors();
@@ -95,14 +81,14 @@ class PasswordField extends TextField
             $char = $terminal->readChar();
 
             // Enter key pressed
-            if ($char === PHP_EOL) {
+            if (PHP_EOL === $char) {
                 $terminal->writeLine('');
                 break;
             }
 
             // Backspace handling
-            if ($char === "\x7F" || $char === "\x08") {
-                if ($password !== '') {
+            if ("\x7F" === $char || "\x08" === $char) {
+                if ('' !== $password) {
                     $password = substr($password, 0, -1);
                     $terminal->write("\x08 \x08");
                 }
@@ -114,18 +100,18 @@ class PasswordField extends TextField
         }
 
         $terminal->normalMode();
+
         return $this->parseInput($password);
     }
 
     /**
-     * Build the prompt string
-     *
-     * @return string
+     * Build the prompt string.
      */
     private function buildPrompt(): string
     {
         $label = $this->getLabel();
         $required = $this->isRequired() ? ' (required)' : '';
+
         return "$label$required: ";
     }
 }

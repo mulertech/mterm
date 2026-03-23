@@ -3,8 +3,8 @@
 namespace MulerTech\MTerm\Form\Field;
 
 /**
- * Class FileField
- * @package MulerTech\MTerm
+ * Class FileField.
+ *
  * @author Sébastien Muler
  */
 class FileField extends AbstractField
@@ -15,31 +15,32 @@ class FileField extends AbstractField
 
     /**
      * @param array<string> $extensions
+     *
      * @return $this
      */
     public function setAllowedExtensions(array $extensions): self
     {
         $this->allowedExtensions = array_map('strtolower', $extensions);
+
         return $this;
     }
 
     /**
-     * @param int $bytes
      * @return $this
      */
     public function setMaxSize(int $bytes): self
     {
         $this->maxSize = $bytes;
+
         return $this;
     }
 
     /**
-     * @param string $input
      * @return string|int|float|array<int|string, string>
      */
     public function processInput(string $input): string|int|float|array
     {
-        if ($input === '' && !is_null($this->defaultValue)) {
+        if ('' === $input && !is_null($this->defaultValue)) {
             return $this->defaultValue;
         }
 
@@ -48,19 +49,21 @@ class FileField extends AbstractField
 
     /**
      * @param string|int|float|array<int|string, string>|null $value
+     *
      * @return array<string>
      */
     public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value === '') {
+        if ('' === $value) {
             return $errors;
         }
 
         if (is_string($value)) {
             if (!file_exists($value)) {
                 $errors[] = "File not found: $value";
+
                 return $errors;
             }
 
@@ -72,7 +75,7 @@ class FileField extends AbstractField
                 }
             }
 
-            if ($this->maxSize !== null) {
+            if (null !== $this->maxSize) {
                 $fileSize = filesize($value);
                 if ($fileSize > $this->maxSize) {
                     $maxSizeMb = number_format($this->maxSize / 1048576, 2);

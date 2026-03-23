@@ -5,60 +5,40 @@ namespace MulerTech\MTerm\Form\Field;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
- * Interface FieldInterface
- * @package MulerTech\MTerm
+ * Interface FieldInterface.
+ *
  * @author Sébastien Muler
  */
 interface FieldInterface
 {
     /**
-     * Get field name
-     *
-     * @return string
+     * Get field name.
      */
     public function getName(): string;
 
     /**
-     * Get field label
-     *
-     * @return string
+     * Get field label.
      */
     public function getLabel(): string;
 
     /**
-     * Get field description
-     *
-     * @return string|null
+     * Get field description.
      */
     public function getDescription(): ?string;
 
-    /**
-     * @param string $description
-     * @return self
-     */
     public function setDescription(string $description): self;
 
     /**
-     * Check if field is required
-     *
-     * @return bool
+     * Check if field is required.
      */
     public function isRequired(): bool;
 
-    /**
-     * @param bool $required
-     * @return self
-     */
     public function setRequired(bool $required = true): self;
 
-    /**
-     * @return void
-     */
     public function clearErrors(): void;
 
     /**
      * @param string|int|float|array<string> $defaultValue
-     * @return self
      */
     public function setDefault(string|int|float|array $defaultValue): self;
 
@@ -68,26 +48,25 @@ interface FieldInterface
     public function getDefault(): string|int|float|array|null;
 
     /**
-     * Process user input
+     * Process user input.
      *
      * @param string $input Raw input from user
+     *
      * @return string|int|float|array<int|string, string> Processed input value
      */
     public function processInput(string $input): string|int|float|array;
 
     /**
-     * Validate field value
+     * Validate field value.
      *
      * @param string|int|float|array<int|string, string>|null $value Field value to validate
+     *
      * @return array<string> List of error messages (empty if valid)
      */
     public function validate(string|int|float|array|null $value): array;
 
     /**
-     * Set terminal instance to be used for input/output operations
-     *
-     * @param Terminal $terminal
-     * @return self
+     * Set terminal instance to be used for input/output operations.
      */
     public function setTerminal(Terminal $terminal): self;
 }

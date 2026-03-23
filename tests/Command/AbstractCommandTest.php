@@ -4,6 +4,7 @@ namespace MulerTech\MTerm\Tests\Command;
 
 use MulerTech\MTerm\Command\AbstractCommand;
 use MulerTech\MTerm\Core\Terminal;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
@@ -24,6 +25,7 @@ class AbstractCommandTest extends TestCase
     /**
      * @throws ReflectionException
      */
+    #[AllowMockObjectsWithoutExpectations]
     public function testNameIsReturnedCorrectly(): void
     {
         // Create a concrete implementation of the abstract class
@@ -43,6 +45,7 @@ class AbstractCommandTest extends TestCase
     /**
      * @throws ReflectionException
      */
+    #[AllowMockObjectsWithoutExpectations]
     public function testDescriptionIsReturnedCorrectly(): void
     {
         $command = new class($this->terminal) extends AbstractCommand {

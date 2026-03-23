@@ -5,8 +5,8 @@ namespace MulerTech\MTerm\Form\Field\Template;
 use MulerTech\MTerm\Form\Field\SelectField;
 
 /**
- * Class SelectSingleArrowTemplate
- * @package MulerTech\MTerm
+ * Class SelectSingleArrowTemplate.
+ *
  * @author Sébastien Muler
  */
 class SelectSingleArrowTemplate extends SelectField

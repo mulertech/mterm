@@ -11,10 +11,11 @@ use ReflectionException;
 class RadioFieldTest extends TestCase
 {
     private RadioField $field;
+    private Terminal $terminal;
 
     protected function setUp(): void
     {
-        $this->terminal = $this->createMock(Terminal::class);
+        $this->terminal = $this->createStub(Terminal::class);
         $this->field = new RadioField('choice', 'Choose option');
         $this->field->setTerminal($this->terminal);
     }

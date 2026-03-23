@@ -3,18 +3,14 @@
 namespace MulerTech\MTerm\Form\Field;
 
 /**
- * Class RangeField
- * @package MulerTech\MTerm
+ * Class RangeField.
+ *
  * @author Sébastien Muler
  */
 class RangeField extends NumberField
 {
     private int $step = 1;
 
-    /**
-     * @param string $name
-     * @param string $label
-     */
     public function __construct(string $name, string $label)
     {
         parent::__construct($name, $label);
@@ -23,18 +19,15 @@ class RangeField extends NumberField
     }
 
     /**
-     * @param int $step
      * @return $this
      */
     public function setStep(int $step): self
     {
         $this->step = max(1, $step);
+
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getStep(): int
     {
         return $this->step;
@@ -42,18 +35,19 @@ class RangeField extends NumberField
 
     /**
      * @param string|int|float|array<int|string, string>|null $value
+     *
      * @return array<string>
      */
     public function validate(string|int|float|array|null $value): array
     {
         $errors = parent::validate($value);
 
-        if ($value === '') {
+        if ('' === $value) {
             return $errors;
         }
 
         if (is_numeric($value)) {
-            if ($this->step > 1 && ((int)$value % $this->step) !== 0) {
+            if ($this->step > 1 && ((int) $value % $this->step) !== 0) {
                 $errors[] = "Value must be a multiple of $this->step.";
             }
         }

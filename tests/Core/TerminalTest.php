@@ -3,6 +3,7 @@
 namespace MulerTech\MTerm\Tests\Core;
 
 use MulerTech\MTerm\Core\Terminal;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionException;
@@ -41,6 +42,7 @@ class TerminalTest extends TestCase
         $this->assertEquals('J', $terminal->readChar('Enter name: '));
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWriteWithAnsiSupportRealCase(): void
     {
         // Create a mock that will force supportsAnsi() to return false
@@ -58,6 +60,7 @@ class TerminalTest extends TestCase
         $this->assertEquals('[0;32mTest[0m', $output);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWriteWithoutAnsiSupportRealCase(): void
     {
         // Create a mock that will force supportsAnsi() to return false
@@ -75,6 +78,7 @@ class TerminalTest extends TestCase
         $this->assertEquals('Test', $output);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWriteLineWithAnsiSupportRealCase(): void
     {
         // Create a mock that will force supportsAnsi() to return false
@@ -92,6 +96,7 @@ class TerminalTest extends TestCase
         $this->assertEquals('[0;32mTest' . PHP_EOL . '[0m', $output);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testWriteLineWithoutAnsiSupportRealCase(): void
     {
         // Create a mock that will force supportsAnsi() to return false

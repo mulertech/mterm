@@ -3,27 +3,20 @@
 namespace MulerTech\MTerm\Form\Validator;
 
 /**
- * Class EmailValidator
- * @package MulerTech\MTerm
+ * Class EmailValidator.
+ *
  * @author Sébastien Muler
  */
 class EmailValidator extends AbstractValidator
 {
-    /**
-     * @param string $errorMessage
-     */
-    public function __construct(string $errorMessage = "Please enter a valid email address.")
+    public function __construct(string $errorMessage = 'Please enter a valid email address.')
     {
         parent::__construct($errorMessage);
     }
 
-    /**
-     * @param mixed $value
-     * @return string|null
-     */
     public function validate(mixed $value): ?string
     {
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return null;
         }
 

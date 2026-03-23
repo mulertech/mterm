@@ -3,8 +3,8 @@
 namespace MulerTech\MTerm\Form\Validator;
 
 /**
- * Class NumericRangeValidator
- * @package MulerTech\MTerm
+ * Class NumericRangeValidator.
+ *
  * @author Sébastien Muler
  */
 class NumericRangeValidator extends AbstractValidator
@@ -12,55 +12,46 @@ class NumericRangeValidator extends AbstractValidator
     private ?float $min;
     private ?float $max;
 
-    /**
-     * @param float|null $min
-     * @param float|null $max
-     * @param string|null $errorMessage
-     */
     public function __construct(
         ?float $min = null,
         ?float $max = null,
-        ?string $errorMessage = null
+        ?string $errorMessage = null,
     ) {
         $this->min = $min;
         $this->max = $max;
 
-        if ($errorMessage === null) {
-            if ($min !== null && $max !== null) {
+        if (null === $errorMessage) {
+            if (null !== $min && null !== $max) {
                 $errorMessage = "Value must be between $min and $max.";
-            } elseif ($min !== null) {
+            } elseif (null !== $min) {
                 $errorMessage = "Value must be at least $min.";
-            } elseif ($max !== null) {
+            } elseif (null !== $max) {
                 $errorMessage = "Value cannot exceed $max.";
             } else {
-                $errorMessage = "Invalid number.";
+                $errorMessage = 'Invalid number.';
             }
         }
 
         parent::__construct($errorMessage);
     }
 
-    /**
-     * @param mixed $value
-     * @return string|null
-     */
     public function validate(mixed $value): ?string
     {
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return null;
         }
 
         if (!is_numeric($value)) {
-            return "Value must be a number.";
+            return 'Value must be a number.';
         }
 
         $numericValue = (float) $value;
 
-        if ($this->min !== null && $numericValue < $this->min) {
+        if (null !== $this->min && $numericValue < $this->min) {
             return $this->errorMessage;
         }
 
-        if ($this->max !== null && $numericValue > $this->max) {
+        if (null !== $this->max && $numericValue > $this->max) {
             return $this->errorMessage;
         }
 

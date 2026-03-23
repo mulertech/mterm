@@ -3,16 +3,15 @@
 namespace MulerTech\MTerm\Core;
 
 /**
- * Class CommandRunner
- * @package MulerTech\MTerm
+ * Class CommandRunner.
+ *
  * @author Sébastien Muler
  */
 class CommandRunner
 {
     /**
-     * Execute a command and capture the output and return code
+     * Execute a command and capture the output and return code.
      *
-     * @param string $command
      * @return array{output: array<int, string>, returnCode: int}
      */
     public function run(string $command): array
@@ -20,16 +19,15 @@ class CommandRunner
         $output = [];
         $returnCode = 0;
 
-        exec($command . ' 2>&1', $output, $returnCode);
+        exec($command.' 2>&1', $output, $returnCode);
 
         return [
             'output' => $output,
-            'returnCode' => $returnCode
+            'returnCode' => $returnCode,
         ];
     }
 
     /**
-     * @param string $command
      * @return array{stdout: false|string, stderr: false|string, returnCode: int}
      */
     public function runWithStderr(string $command): array
@@ -37,7 +35,7 @@ class CommandRunner
         $descriptorSpec = [
             0 => ['pipe', 'r'],  // stdin
             1 => ['pipe', 'w'],  // stdout
-            2 => ['pipe', 'w']   // stderr
+            2 => ['pipe', 'w'],   // stderr
         ];
 
         $pipes = [];
@@ -55,7 +53,7 @@ class CommandRunner
         return [
             'stdout' => $stdout,
             'stderr' => $stderr,
-            'returnCode' => $returnCode
+            'returnCode' => $returnCode,
         ];
     }
 }

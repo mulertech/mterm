@@ -4,6 +4,7 @@ namespace MulerTech\MTerm\Tests\Form\Field;
 
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\PasswordField;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -23,12 +24,14 @@ class PasswordFieldTest extends TestCase
         $this->field->setTerminal($this->terminal);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testDefaultValues(): void
     {
         $this->assertTrue($this->field->isMaskInput());
         $this->assertEquals('*', $this->field->getMaskChar());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSetMaskInput(): void
     {
         // Test disabling mask
@@ -41,6 +44,7 @@ class PasswordFieldTest extends TestCase
         $this->assertTrue($this->field->isMaskInput());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSetMaskChar(): void
     {
         $result = $this->field->setMaskChar('•');
@@ -48,6 +52,7 @@ class PasswordFieldTest extends TestCase
         $this->assertEquals('•', $this->field->getMaskChar());
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testProcessInputWithoutMaskInput(): void
     {
         $this->field->setMaskInput(false)->setDefault('secret');
@@ -55,6 +60,7 @@ class PasswordFieldTest extends TestCase
         $this->assertEquals('secret', $result);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testProcessInputWithoutTerminalSet(): void
     {
         $field = new PasswordField('password', 'Password');
@@ -100,6 +106,7 @@ class PasswordFieldTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testInheritedValidation(): void
     {
         // Test that validation is inherited from TextField
