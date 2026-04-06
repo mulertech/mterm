@@ -2,7 +2,12 @@
   "name": "mulertech/mterm",
   "description": "This application is a PHP CLI.",
   "type": "library",
-  "keywords": ["cli", "php", "tools", "terminal"],
+  "keywords": [
+    "cli",
+    "php",
+    "tools",
+    "terminal"
+  ],
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
@@ -12,7 +17,7 @@
     }
   ],
   "require": {
-    "php": "^8.3",
+    "php": "^8.4",
     "ext-mbstring": "*"
   },
   "require-dev": {
@@ -31,5 +36,8 @@
     "psr-4": {
       "MulerTech\\MTerm\\Tests\\": "./tests"
     }
+  },
+  "config": {
+    "sort-packages": true
   }
 }
