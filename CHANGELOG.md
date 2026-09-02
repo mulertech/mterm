@@ -1,5 +1,19 @@
 # Release notes for mterm
 
+## v2.0.0 - 2026-09-02
+
+- Changed: `Core` is rewritten and its API breaks — hence the major version. `Form`, `Command` and `Utils` keep their behaviour and are only reconnected to the new output.
+- Added: an abstract output — `Core\Output\OutputInterface`, `StreamOutput`, `BufferedOutput`. Display is no longer an `echo`, so it can be captured, redirected and tested.
+- Added: `Core\Color`, an enum replacing the string constants, and decoration detection that honours `NO_COLOR` and a non-terminal output. A redirected output no longer carries escape sequences.
+- Changed: `clear()`, `clearLine()`, `moveCursor()`, `hideCursor()` and `showCursor()` write ANSI sequences instead of forking a process. `system('clear')` is gone. The only remaining `system()` is `CommandRunner::runDirect()`, outside the display path, where a command must write to the terminal in real time.
+- Added: `Core\TerminalMode`, which saves the terminal state with `stty -g` before changing it and restores it through a shutdown handler and signal handlers. It refuses to enter raw mode when it cannot read the state, rather than entering a mode it could not undo.
+- Added: `Core\Input\InputReader`, `Key` and `KeyPress`. Arrows, Escape, Delete, Home/End, PageUp/PageDown and F1–F12 are recognised (CSI and SS3), and multi-byte UTF-8 characters are returned whole — where the previous `readChar()` read a single byte and could read neither.
+- Added: `Ui\Indicator`, `IndicatorStatus` and `IndicatorRenderer` — four states with one shape and one colour each. A failing indicator built without the label of its remedy throws: the rule holds because it cannot be bypassed.
+- Added: `Ui\Menu` and `Ui\MenuItem` — nesting, current path, back and quit. The menu carries the cycle around an action: confirm, run, catch, return. An item declares its confirmation instead of implementing it, so a destructive action cannot silently ship without one.
+- Fixed: `SelectField` looped forever on an exhausted input stream, and never returned its default in single selection.
+- Fixed: `CommandRunner` dereferenced pipes that did not exist when `proc_open` failed. It now fails immediately, naming the command.
+- Note: `ext-pcntl` stays a suggestion — requiring it would reach, through `mulertech/database`, the images that do not install it. Without it, an interruption leaves the terminal without echo; that degradation is now announced on standard error along with its remedy (`stty sane`). A consumer driving an interactive session should require the extension itself.
+
 ## v1.0.2 - 2025-03-26
 
 v1.0.2
