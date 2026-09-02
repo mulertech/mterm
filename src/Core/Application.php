@@ -40,9 +40,6 @@ class Application
 
     public function run(): void
     {
-        // Point d'entrée principal pour l'exécution de l'application
-        $this->terminal->writeLine('MTerm Application Started', 'green');
-
-        // Logique d'application à implémenter
+        $this->terminal->writeLine('MTerm Application Started', Color::Green);
     }
 }

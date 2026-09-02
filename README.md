@@ -21,7 +21,7 @@ ___
 Add to your "**composer.json**" file into require section :
 
 ```
-"mulertech/mterm": "^1.0"
+"mulertech/mterm": "^2.0"
 ```
 
 and run the command :
@@ -35,7 +35,7 @@ php composer.phar update
 Run the command :
 
 ```
-php composer.phar require mulertech/mterm "^1.0"
+php composer.phar require mulertech/mterm "^2.0"
 ```
 
 ___
@@ -47,14 +47,32 @@ MTerm provides a simple and elegant way to build interactive command-line interf
 ### Basic Usage
 
 ```php
+use MulerTech\MTerm\Core\Color;
+use MulerTech\MTerm\Core\Terminal;
+
 $terminal = new Terminal();
 $terminal->write('Hello, World!');
-$terminal->writeLine('Hello with a new line!');
+$terminal->writeLine('Hello with a new line!', Color::Green);
 ```
 
 ### Terminal Class
 
-The main class for interacting with the terminal.
+The main class for interacting with the terminal. It writes through an output
+and reads through an input reader, both replaceable:
+
+```php
+use MulerTech\MTerm\Core\Input\InputReader;
+use MulerTech\MTerm\Core\Output\StreamOutput;
+use MulerTech\MTerm\Core\Terminal;
+use MulerTech\MTerm\Core\TerminalMode;
+
+$terminal = new Terminal();                                  // standard streams
+$terminal = new Terminal(new StreamOutput($file));           // into a file
+$terminal = new Terminal(new StreamOutput(), new InputReader($stream), new TerminalMode());
+```
+
+Escape sequences are written only when the output is a terminal that accepts
+them, so a display redirected to a file carries text alone.
 
 ### Method Reference
 
@@ -73,7 +91,7 @@ $input = $terminal->read(); // No prompt
 
 ##### `readChar(string $prompt = null): string`
 
-Reads a single character from the terminal.
+Reads one whole character, however many bytes it takes.
 
 ```php
 $char = $terminal->readChar('Continue? (y/n): ');
@@ -82,104 +100,190 @@ if ($char === 'y') {
 }
 ```
 
+##### `readKey(string $prompt = null): KeyPress`
+
+Reads one key press. An escape sequence — an arrow, a function key — comes back
+as the key it names rather than as its bytes.
+
+```php
+use MulerTech\MTerm\Core\Input\Key;
+
+$press = $terminal->readKey();
+
+if ($press->is(Key::Up)) {
+    // Move the cursor up
+}
+
+if ($press->isCharacter()) {
+    $typed = $press->character;
+}
+
+if ($press->isEndOfInput()) {
+    // Nothing left to read
+}
+```
+
 #### Output Methods
 
-##### `write(string $text, string $color = null, bool $bold = false): void`
+##### `write(string $text, Color $color = null, bool $bold = false): void`
 
 Writes text to the terminal without a newline.
 
 ```php
 $terminal->write('Regular text ');
-$terminal->write('Red text ', 'red');
-$terminal->write('Bold blue ', 'blue', true);
+$terminal->write('Red text ', Color::Red);
+$terminal->write('Bold blue ', Color::Blue, true);
 ```
 
-##### `writeLine(string $text, string $color = null, bool $bold = false): void`
+##### `writeLine(string $text = '', Color $color = null, bool $bold = false): void`
 
 Writes text to the terminal followed by a newline.
 
 ```php
 $terminal->writeLine('First line');
-$terminal->writeLine('Success message', 'green');
-$terminal->writeLine('Error message', 'red', true);
+$terminal->writeLine('Success message', Color::Green);
+$terminal->writeLine('Error message', Color::Red, true);
+$terminal->writeLine(); // An empty line
 ```
+
+##### `getOutput(): OutputInterface` and `getInput(): InputReader`
+
+Return the output and the input reader the terminal was built with.
 
 #### Terminal Control
 
+Screen and cursor are driven by ANSI sequences, without forking a subprocess.
+
 ##### `clear(): void`
 
-Clears the terminal screen.
+Erases the screen and puts the cursor back at its top left corner.
 
 ```php
 $terminal->clear();
 ```
 
-##### `specialMode(): void`
+##### `clearLine(): void`
 
-Sets the terminal to special mode where characters are read immediately.
-
-```php
-$terminal->specialMode();
-// Read characters without waiting for Enter
-$terminal->normalMode(); // Return to standard mode
-```
-
-##### `normalMode(): void`
-
-Restores the terminal to its normal mode.
+Erases the line the cursor sits on, and returns to its first column.
 
 ```php
-$terminal->normalMode();
+$terminal->clearLine();
+$terminal->write('Replaced content');
 ```
 
-##### `system(string $command): void`
+##### `moveCursor(int $row, int $column): void`
 
-Executes a system command.
+Places the cursor, counting rows and columns from one.
 
 ```php
-$terminal->system('ls -la');
+$terminal->moveCursor(1, 1); // Top left corner
 ```
+
+##### `hideCursor(): void` and `showCursor(): void`
+
+Hide the cursor while a page is being repainted, and show it again.
+
+```php
+$terminal->hideCursor();
+$terminal->showCursor();
+```
+
+##### `enableRawMode(): void`
+
+Reads keys one by one, without echo. The previous state is saved and restored
+by a shutdown handler as well as by the signal handlers, so an exception or an
+interruption never leaves the terminal without echo. Catching the interruption
+needs `ext-pcntl`; without it only the shutdown handler stands.
+
+```php
+$terminal->enableRawMode();
+$press = $terminal->readKey();
+$terminal->disableRawMode();
+```
+
+##### `disableRawMode(): void` and `isRawMode(): bool`
+
+Put the terminal back as it was found, and tell whether it is in raw mode.
 
 #### Utility Methods
 
 ##### `supportsAnsi(): bool`
 
-Checks if the terminal supports ANSI color codes.
+Tells whether escape sequences written to the output are interpreted. It answers
+false when `NO_COLOR` is set, and when the output is not a terminal.
 
 ```php
 if ($terminal->supportsAnsi()) {
-    $terminal->writeLine('Colors supported', 'green');
+    $terminal->writeLine('Colors supported', Color::Green);
 }
 ```
 
-##### `inputStream(): resource`
+### Color
 
-Returns the input stream resource.
+The eight colors every ANSI terminal renders: `Color::Black`, `Color::Red`,
+`Color::Green`, `Color::Yellow`, `Color::Blue`, `Color::Magenta`, `Color::Cyan`,
+`Color::White`. Passing `true` as the third argument of `write()` and
+`writeLine()` makes the text bold.
 
 ```php
-$stream = $terminal->inputStream();
+Color::Green->sequence();     // "\033[0;32m"
+Color::Green->sequence(true); // "\033[1;32m"
+Color::RESET;                 // "\033[0m"
 ```
 
-### Available Colors
+### Output Classes
 
-The Terminal class supports: black, red, green, yellow, blue, magenta, cyan, white.
+#### `OutputInterface`
 
-### Creating Interactive Menus
+Destination of everything the library displays: `write(string $text): void` and
+`isDecorated(): bool`.
+
+#### `StreamOutput`
+
+Writes to a stream, the standard output unless another one is given. Decoration
+is detected — `NO_COLOR`, a stream that is not a terminal — or forced:
 
 ```php
-function showMenu($terminal) {
-    $terminal->clear();
-    $terminal->writeLine('=== MENU ===', 'blue', true);
-    $terminal->writeLine('1. Option One');
-    $terminal->writeLine('2. Exit');
-    return $terminal->read('Select: ');
-}
-
-while (true) {
-    $choice = showMenu($terminal);
-    if ($choice === '2') break;
-}
+$output = new StreamOutput();                       // Standard output
+$output = new StreamOutput(fopen('report.txt', 'w')); // No escape sequence written
+$output = new StreamOutput(STDOUT, true);           // Decoration forced on
 ```
+
+#### `BufferedOutput`
+
+Keeps everything in memory, which is how a display is asserted upon in a test.
+
+```php
+$output = new BufferedOutput();
+$terminal = new Terminal($output);
+$terminal->writeLine('Hello');
+
+$output->content(); // "Hello\n"
+$output->fetch();   // "Hello\n", and empties the buffer
+```
+
+### Input Classes
+
+#### `InputReader`
+
+Reads a stream by press rather than by byte: `readLine()`, `readCharacter()` —
+one whole character, accents and emoji included — and `readKey()`.
+
+#### `Key`
+
+The keys that carry no printable character of their own: `Up`, `Down`, `Right`,
+`Left`, `Enter`, `Escape`, `Backspace`, `Delete`, `Insert`, `Tab`, `Space`,
+`Home`, `End`, `PageUp`, `PageDown` and `F1` to `F12`.
+
+#### `KeyPress`
+
+One press: `is(Key $key)`, `isCharacter()`, `isEndOfInput()`, and the `key` and
+`character` it carries.
+
+### TerminalMode
+
+Raw mode and the guarantee that the terminal comes back from it. `Terminal`
+drives it; it is only built directly to be replaced in a test.
 
 ## Command System
 
@@ -341,6 +445,16 @@ $result = $runner->runWithStderr('ls /nonexistent');
 // Returns ['stdout' => '', 'stderr' => 'error message...', 'returnCode' => 1]
 ```
 
+#### `runDirect(string $command): int`
+
+Executes a command that writes to the terminal itself, and returns its exit
+code. Deployment logs and test suites are watched as they unfold; capturing
+their output to display it afterwards would trade that for a tidier summary.
+
+```php
+$returnCode = $runner->runDirect('docker compose logs -f');
+```
+
 ### Combining Classes Example
 
 ```php
@@ -352,7 +466,7 @@ $command = $terminal->read('Command: ');
 $result = $runner->runWithStderr($command);
 $terminal->writeLine($result['stdout']);
 if ($result['stderr']) {
-    $terminal->writeLine($result['stderr'], 'red');
+    $terminal->writeLine($result['stderr'], Color::Red);
 }
 ```
 
@@ -1227,13 +1341,13 @@ $error = $validator->validate('123'); // Returns error message (invalid)
 
 ### ProgressBar
 
-#### `__construct(Terminal $terminal, int $total = 100, int $width = 50, string $completeChar = '=', string $incompleteChar = '-', string $color = Terminal::COLORS['green'])`
+#### `__construct(Terminal $terminal, int $total = 100, int $width = 50, string $completeChar = '=', string $incompleteChar = '-', Color $color = Color::Green)`
 
 Constructor for the ProgressBar class.
 
 ```php
 $terminal = new Terminal();
-$progressBar = new ProgressBar($terminal, 100, 50, '=', '-', 'green');
+$progressBar = new ProgressBar($terminal, 100, 50, '=', '-', Color::Green);
 ```
 
 #### `start(): void`
@@ -1270,13 +1384,13 @@ $progressBar->finish();
 
 ### TableFormatter
 
-#### `__construct(Terminal $terminal, string $headerColor = Terminal::COLORS['green'], string $borderColor = Terminal::COLORS['blue'], string $cellColor = Terminal::COLORS['white'], int $padding = 1)`
+#### `__construct(Terminal $terminal, Color $headerColor = Color::Green, Color $borderColor = Color::Blue, Color $cellColor = Color::White, int $padding = 1)`
 
 Constructor for the TableFormatter class.
 
 ```php
 $terminal = new Terminal();
-$tableFormatter = new TableFormatter($terminal, 'green', 'blue', 'white', 1);
+$tableFormatter = new TableFormatter($terminal, Color::Green, Color::Blue, Color::White, 1);
 ```
 
 #### `renderTable(array $headers, array $rows): void`
@@ -1294,3 +1408,100 @@ $rows = [
 $tableFormatter->renderTable($headers, $rows);
 ```
 
+## Interface Classes
+
+Two components for any CLI presenting states and choices.
+
+### Indicator
+
+One checked item, its state, and what to do about it. Four states, each with a
+shape as well as a color, so a colorless output still tells them apart:
+
+| State | Shape | Color | Meaning |
+|---|---|---|---|
+| `Compliant` | ✔ | green | Conforms to what is expected |
+| `Watch` | ▲ | yellow | Works, but drifts towards a failure worth preventing |
+| `Failing` | ✘ | red | Does not conform, and says how to put it right |
+| `Unavailable` | · | black | Cannot be checked, so says nothing about conformity |
+
+A failing indicator without the label of its remedy is refused, so a panel
+cannot announce a problem while leaving the reader without a move.
+
+```php
+use MulerTech\MTerm\Ui\Indicator;
+use MulerTech\MTerm\Ui\IndicatorStatus;
+
+Indicator::compliant('Containers running');
+Indicator::watch('Disk at 82%', 'prune the unused images'); // The remedy is optional here
+Indicator::failing('TLS certificate expired', 'renew it with certbot');
+Indicator::unavailable('Backup age', 'host unreachable');
+
+// When the state is only known at runtime
+Indicator::of($status, 'Disk at 82%', 'prune the unused images');
+
+Indicator::of(IndicatorStatus::Failing, 'TLS certificate expired'); // InvalidArgumentException
+```
+
+### IndicatorRenderer
+
+Displays indicators on a common alignment, remedies in their own column.
+
+```php
+use MulerTech\MTerm\Ui\IndicatorRenderer;
+
+(new IndicatorRenderer($terminal))->render(
+    Indicator::compliant('Containers running'),
+    Indicator::failing('TLS certificate expired', 'renew it with certbot'),
+    Indicator::unavailable('Backup age', 'host unreachable'),
+);
+```
+
+```
+✔ Containers running
+✘ TLS certificate expired  → renew it with certbot
+· Backup age               → host unreachable
+```
+
+### Menu
+
+A list of choices, nestable, driven with the arrow keys: `↑`/`↓` move, `ENTER`
+selects, `ESC` — or `q` — goes back one level and leaves the menu at its top.
+
+The menu carries the cycle around an action: confirm, run, report a failure,
+and hand the terminal back. An item states its confirmation rather than asking
+for one itself, so a destructive move cannot reach the user unconfirmed.
+
+```php
+use MulerTech\MTerm\Ui\Menu;
+use MulerTech\MTerm\Ui\MenuItem;
+
+$containers = new Menu($terminal, 'Containers');
+$containers->add(MenuItem::action('Restart', $restart, 'Restart every container?'));
+
+$menu = new Menu($terminal, 'Production');
+$menu->add(MenuItem::action('Status', $status))
+    ->add(MenuItem::menu('Containers', $containers));
+
+$menu->run();
+```
+
+```
+Production › Containers
+
+❯ Restart
+  Prune images
+
+↑/↓ move   ENTER select   ESC back
+```
+
+### MenuItem
+
+One line of a menu: either an action to run, or a menu to enter.
+
+#### `action(string $label, callable $action, string $confirmation = null): MenuItem`
+
+An action, and the question to answer before it runs.
+
+#### `menu(string $label, Menu $submenu): MenuItem`
+
+A submenu, entered with `ENTER` and left with `ESC`.

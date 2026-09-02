@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Command;
 
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
@@ -43,16 +44,16 @@ class HelpCommand extends AbstractCommand
         $command = $this->registry->get($commandName);
 
         if (null === $command) {
-            $this->terminal->writeLine("Command '{$commandName}' not found", 'red');
+            $this->terminal->writeLine("Command '{$commandName}' not found", Color::Red);
 
             return 1;
         }
 
-        $this->terminal->writeLine('COMMAND', 'green', true);
-        $this->terminal->writeLine("  {$command->getName()}", 'white');
+        $this->terminal->writeLine('COMMAND', Color::Green, true);
+        $this->terminal->writeLine("  {$command->getName()}", Color::White);
         $this->terminal->writeLine('');
-        $this->terminal->writeLine('DESCRIPTION', 'green', true);
-        $this->terminal->writeLine("  {$command->getDescription()}", 'white');
+        $this->terminal->writeLine('DESCRIPTION', Color::Green, true);
+        $this->terminal->writeLine("  {$command->getDescription()}", Color::White);
         $this->terminal->writeLine('');
         $command->showHelp();
 
@@ -64,20 +65,20 @@ class HelpCommand extends AbstractCommand
      */
     private function showAllCommands(): int
     {
-        $this->terminal->writeLine('Available Commands:', 'green', true);
+        $this->terminal->writeLine('Available Commands:', Color::Green, true);
         $this->terminal->writeLine('');
 
         $commands = $this->registry->getAll();
         ksort($commands);
 
         foreach ($commands as $name => $command) {
-            $this->terminal->write("  {$name}", 'yellow');
+            $this->terminal->write("  {$name}", Color::Yellow);
             $this->terminal->writeLine(" - {$command->getDescription()}");
         }
 
         $this->terminal->writeLine('');
         $this->terminal->writeLine('For more information about a command, type:');
-        $this->terminal->writeLine('  help <command>', 'cyan');
+        $this->terminal->writeLine('  help <command>', Color::Cyan);
 
         return 0;
     }

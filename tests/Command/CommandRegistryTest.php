@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use MulerTech\MTerm\Command\CommandInterface;
 use MulerTech\MTerm\Command\CommandRegistry;
 use MulerTech\MTerm\Command\HelpCommand;
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
@@ -191,7 +192,7 @@ class CommandRegistryTest extends TestCase
         // Terminal expectations for non-existent command
         $terminal->expects($this->once())
             ->method('writeLine')
-            ->with("Command 'non-existent' not found", 'red');
+            ->with("Command 'non-existent' not found", Color::Red);
         
         $helpCommand = new HelpCommand($terminal, $registry);
         $result = $helpCommand->execute(['non-existent']);

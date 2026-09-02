@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Tests\Utils;
 
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Utils\ProgressBar;
 use PHPUnit\Framework\MockObject\Exception;
@@ -108,7 +109,7 @@ class ProgressBarTest extends TestCase
         $this->terminalMock
             ->expects($this->once())
             ->method('write')
-            ->with($this->stringContains('[**********##########]  50%'), Terminal::COLORS['red'], false);
+            ->with($this->stringContains('[**********##########]  50%'), Color::Red, false);
 
         $progressBar = new ProgressBar(
             $this->terminalMock,
@@ -116,7 +117,7 @@ class ProgressBarTest extends TestCase
             20,   // width
             '*',  // completeChar
             '#',  // incompleteChar
-            Terminal::COLORS['red']
+            Color::Red
         );
 
         $progressBar->setProgress(50);

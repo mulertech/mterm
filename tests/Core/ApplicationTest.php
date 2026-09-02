@@ -3,6 +3,7 @@
 namespace MulerTech\MTerm\Tests\Core;
 
 use MulerTech\MTerm\Core\Application;
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\CommandRunner;
 use MulerTech\MTerm\Core\Terminal;
 use PHPUnit\Framework\MockObject\Exception;
@@ -14,14 +15,14 @@ class ApplicationTest extends TestCase
 {
     protected function setUp(): void
     {
-        // Réinitialiser l'instance singleton
+        // Reset the singleton
         $reflection = new ReflectionProperty(Application::class, 'instance');
         $reflection->setValue(null, null);
     }
 
     protected function tearDown(): void
     {
-        // Réinitialiser l'instance singleton après chaque test
+        // Reset the singleton after each test
         $reflection = new ReflectionProperty(Application::class, 'instance');
         $reflection->setValue(null, null);
     }
@@ -60,7 +61,7 @@ class ApplicationTest extends TestCase
         $terminalMock = $this->createMock(Terminal::class);
         $terminalMock->expects($this->once())
             ->method('writeLine')
-            ->with("MTerm Application Started", "green");
+            ->with('MTerm Application Started', Color::Green);
 
         $application = Application::getInstance();
 

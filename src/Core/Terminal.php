@@ -2,31 +2,37 @@
 
 namespace MulerTech\MTerm\Core;
 
+use MulerTech\MTerm\Core\Input\InputReader;
+use MulerTech\MTerm\Core\Input\KeyPress;
+use MulerTech\MTerm\Core\Output\OutputInterface;
+use MulerTech\MTerm\Core\Output\StreamOutput;
+
 /**
  * Class Terminal.
+ *
+ * Every escape sequence goes through a single gate: an output that is not a
+ * terminal receives the text alone, so a redirected display stays readable.
  *
  * @author Sébastien Muler
  */
 class Terminal
 {
-    public const COLORS = [
-        'black' => '0;30',
-        'red' => '0;31',
-        'green' => '0;32',
-        'yellow' => '0;33',
-        'blue' => '0;34',
-        'magenta' => '0;35',
-        'cyan' => '0;36',
-        'white' => '0;37',
-        'bold_black' => '1;30',
-        'bold_red' => '1;31',
-        'bold_green' => '1;32',
-        'bold_yellow' => '1;33',
-        'bold_blue' => '1;34',
-        'bold_magenta' => '1;35',
-        'bold_cyan' => '1;36',
-        'bold_white' => '1;37',
-    ];
+    public function __construct(
+        private readonly OutputInterface $output = new StreamOutput(),
+        private readonly InputReader $input = new InputReader(),
+        private readonly TerminalMode $mode = new TerminalMode(),
+    ) {
+    }
+
+    public function getOutput(): OutputInterface
+    {
+        return $this->output;
+    }
+
+    public function getInput(): InputReader
+    {
+        return $this->input;
+    }
 
     public function read(?string $prompt = null): string
     {
@@ -34,83 +40,114 @@ class Terminal
             $this->write($prompt);
         }
 
-        $resource = $this->inputStream();
-
-        $line = $resource ? fgets($resource) : false;
-
-        return $line ? trim($line) : '';
+        return $this->input->readLine();
     }
 
+    /**
+     * One whole character, accents and emoji included.
+     */
     public function readChar(?string $prompt = null): string
     {
         if (null !== $prompt) {
             $this->write($prompt);
         }
 
-        $resource = $this->inputStream();
-
-        $char = $resource ? fgetc($resource) : '';
-
-        return false === $char ? '' : $char;
+        return $this->input->readCharacter();
     }
 
     /**
-     * @param bool $bold Whether to make text bold
+     * One press, with arrows and function keys resolved to the key they name.
      */
-    public function write(string $text, ?string $color = null, bool $bold = false): void
+    public function readKey(?string $prompt = null): KeyPress
     {
-        if (null !== $color && $this->supportsAnsi()) {
-            $colorKey = $bold ? "bold_{$color}" : $color;
-            if (isset(self::COLORS[$colorKey])) {
-                echo "\033[".self::COLORS[$colorKey].'m'.$text."\033[0m";
-
-                return;
-            }
+        if (null !== $prompt) {
+            $this->write($prompt);
         }
 
-        echo $text;
+        return $this->input->readKey();
     }
 
-    /**
-     * @param bool $bold Whether to make text bold
-     */
-    public function writeLine(string $text, ?string $color = null, bool $bold = false): void
+    public function write(string $text, ?Color $color = null, bool $bold = false): void
+    {
+        if (null === $color || !$this->supportsAnsi()) {
+            $this->output->write($text);
+
+            return;
+        }
+
+        $this->output->write($color->sequence($bold).$text.Color::RESET);
+    }
+
+    public function writeLine(string $text = '', ?Color $color = null, bool $bold = false): void
     {
         $this->write($text.PHP_EOL, $color, $bold);
     }
 
+    /**
+     * Erase the screen and put the cursor back at its top left corner.
+     */
     public function clear(): void
     {
-        $this->system(DIRECTORY_SEPARATOR === '/' ? 'clear' : 'cls');
+        $this->writeSequence("\033[H\033[2J");
     }
 
-    public function specialMode(): void
+    /**
+     * Erase the line the cursor sits on, and return to its first column.
+     */
+    public function clearLine(): void
     {
-        $this->system('stty -icanon -echo');
+        $this->writeSequence("\r\033[2K");
     }
 
-    public function normalMode(): void
+    /**
+     * Place the cursor, counting rows and columns from one.
+     */
+    public function moveCursor(int $row, int $column): void
     {
-        $this->system('stty icanon echo');
+        if ($row < 1 || $column < 1) {
+            throw new \InvalidArgumentException(sprintf('Cursor coordinates start at 1, got row %d and column %d.', $row, $column));
+        }
+
+        $this->writeSequence("\033[{$row};{$column}H");
     }
 
-    public function system(string $command): void
+    public function hideCursor(): void
     {
-        system($command);
+        $this->writeSequence("\033[?25l");
+    }
+
+    public function showCursor(): void
+    {
+        $this->writeSequence("\033[?25h");
+    }
+
+    /**
+     * Read keys one by one, without echo. Restored whatever happens next.
+     */
+    public function enableRawMode(): void
+    {
+        $this->mode->enableRaw();
+    }
+
+    public function disableRawMode(): void
+    {
+        $this->mode->restore();
+    }
+
+    public function isRawMode(): bool
+    {
+        return $this->mode->isRaw();
     }
 
     public function supportsAnsi(): bool
     {
-        return DIRECTORY_SEPARATOR === '/'
-            || (function_exists('sapi_windows_vt100_support')
-            && @sapi_windows_vt100_support(STDOUT));
+        return $this->output->isDecorated();
     }
 
-    /**
-     * @return false|resource
-     */
-    public function inputStream()
+    private function writeSequence(string $sequence): void
     {
-        return STDIN;
+        if ($this->supportsAnsi()) {
+            $this->output->write($sequence);
+        }
     }
 }

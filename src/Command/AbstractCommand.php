@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Command;
 
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
@@ -35,6 +36,6 @@ abstract class AbstractCommand implements CommandInterface
      */
     public function showHelp(): void
     {
-        $this->terminal->writeLine($this->getName().': '.$this->getDescription(), 'cyan');
+        $this->terminal->writeLine($this->getName().': '.$this->getDescription(), Color::Cyan);
     }
 }

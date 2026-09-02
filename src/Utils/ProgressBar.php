@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Utils;
 
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
@@ -17,7 +18,7 @@ class ProgressBar
     private int $width;
     private string $completeChar;
     private string $incompleteChar;
-    private string $color;
+    private Color $color;
     private ?float $startTime = null;
 
     public function __construct(
@@ -26,7 +27,7 @@ class ProgressBar
         int $width = 50,
         string $completeChar = '=',
         string $incompleteChar = '-',
-        string $color = Terminal::COLORS['green'],
+        Color $color = Color::Green,
     ) {
         $this->terminal = $terminal;
         $this->total = $total;

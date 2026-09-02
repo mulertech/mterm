@@ -27,6 +27,9 @@
     "phpunit/phpunit": "^12",
     "roave/security-advisories": "dev-latest"
   },
+  "suggest": {
+    "ext-pcntl": "Restores the terminal mode when the process is interrupted"
+  },
   "autoload": {
     "psr-4": {
       "MulerTech\\MTerm\\": "./src"

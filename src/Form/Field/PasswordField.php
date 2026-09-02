@@ -2,6 +2,8 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+use MulerTech\MTerm\Core\Input\Key;
+
 /**
  * Class PasswordField.
  *
@@ -73,35 +75,44 @@ class PasswordField extends TextField
         $prompt = $this->buildPrompt();
 
         $terminal->write($prompt);
-        $terminal->specialMode();
+        $terminal->enableRawMode();
 
         $password = '';
 
         while (true) {
-            $char = $terminal->readChar();
+            $press = $terminal->readKey();
 
-            // Enter key pressed
-            if (PHP_EOL === $char) {
-                $terminal->writeLine('');
+            if ($press->isEndOfInput() || $press->is(Key::Enter)) {
+                $terminal->writeLine();
                 break;
             }
 
-            // Backspace handling
-            if ("\x7F" === $char || "\x08" === $char) {
+            if ($press->is(Key::Backspace)) {
                 if ('' !== $password) {
-                    $password = substr($password, 0, -1);
+                    $password = mb_substr($password, 0, -1);
                     $terminal->write("\x08 \x08");
                 }
-            } // Regular character
-            elseif (ord($char) >= 32) {
-                $password .= $char;
+
+                continue;
+            }
+
+            if ($press->isCharacter() && !$this->isControlCharacter($press->character)) {
+                $password .= $press->character;
                 $terminal->write($this->getMaskChar());
             }
         }
 
-        $terminal->normalMode();
+        $terminal->disableRawMode();
 
         return $this->parseInput($password);
+    }
+
+    /**
+     * A character the terminal would not display, such as a Ctrl combination.
+     */
+    private function isControlCharacter(string $character): bool
+    {
+        return 1 === strlen($character) && ord($character) < 32;
     }
 
     /**

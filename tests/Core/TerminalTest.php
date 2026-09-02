@@ -2,189 +2,176 @@
 
 namespace MulerTech\MTerm\Tests\Core;
 
+use InvalidArgumentException;
+use MulerTech\MTerm\Core\Color;
+use MulerTech\MTerm\Core\Input\Key;
 use MulerTech\MTerm\Core\Terminal;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use MulerTech\MTerm\Tests\Support\TerminalDouble;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionException;
 
 class TerminalTest extends TestCase
 {
-    public function testRead(): void
+    public function testReadReturnsTheLineWithoutItsTerminator(): void
     {
-        $file = fopen(__DIR__ . DIRECTORY_SEPARATOR . 'input', 'r');
+        $double = new TerminalDouble("John Doe\n");
 
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['inputStream', 'write'])
-            ->getMock();
-        $terminal->expects($this->once())
-            ->method('inputStream')
-            ->willReturn($file);
-        $terminal->expects($this->once())
-            ->method('write');
-
-        $this->assertEquals('John Doe', $terminal->read('Enter name: '));
+        $this->assertEquals('John Doe', $double->terminal->read('Enter name: '));
+        $this->assertEquals('Enter name: ', $double->display());
     }
 
-    public function testReadChar(): void
+    public function testReadCharReturnsAWholeCharacter(): void
     {
-        $file = fopen(__DIR__ . DIRECTORY_SEPARATOR . 'input', 'r');
+        $double = new TerminalDouble('éa');
 
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['inputStream', 'write'])
-            ->getMock();
-        $terminal->expects($this->once())
-            ->method('inputStream')
-            ->willReturn($file);
-        $terminal->expects($this->once())
-            ->method('write');
-
-        $this->assertEquals('J', $terminal->readChar('Enter name: '));
+        $this->assertEquals('é', $double->terminal->readChar('Key: '));
+        $this->assertEquals('a', $double->terminal->readChar());
+        $this->assertEquals('Key: ', $double->display());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
-    public function testWriteWithAnsiSupportRealCase(): void
+    public function testReadKeyResolvesAnArrow(): void
     {
-        // Create a mock that will force supportsAnsi() to return false
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['supportsAnsi'])
-            ->getMock();
+        $double = new TerminalDouble("\033[A");
 
-        $terminal->method('supportsAnsi')
-            ->willReturn(true);
-
-        ob_start();
-        $terminal->write('Test', 'green');
-        $output = ob_get_clean();
-
-        $this->assertEquals('[0;32mTest[0m', $output);
+        $this->assertTrue($double->terminal->readKey('Move: ')->is(Key::Up));
+        $this->assertEquals('Move: ', $double->display());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
-    public function testWriteWithoutAnsiSupportRealCase(): void
+    public function testWriteWithAnsiSupport(): void
     {
-        // Create a mock that will force supportsAnsi() to return false
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['supportsAnsi'])
-            ->getMock();
+        $double = new TerminalDouble('', true);
+        $double->terminal->write('Test', Color::Green);
 
-        $terminal->method('supportsAnsi')
-            ->willReturn(false);
-
-        ob_start();
-        $terminal->write('Test', 'green');
-        $output = ob_get_clean();
-
-        $this->assertEquals('Test', $output);
+        $this->assertEquals("\033[0;32mTest\033[0m", $double->display());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
-    public function testWriteLineWithAnsiSupportRealCase(): void
+    public function testWriteInBoldWithAnsiSupport(): void
     {
-        // Create a mock that will force supportsAnsi() to return false
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['supportsAnsi'])
-            ->getMock();
+        $double = new TerminalDouble('', true);
+        $double->terminal->write('Test', Color::Green, true);
 
-        $terminal->method('supportsAnsi')
-            ->willReturn(true);
-
-        ob_start();
-        $terminal->writeLine('Test', 'green');
-        $output = ob_get_clean();
-
-        $this->assertEquals('[0;32mTest' . PHP_EOL . '[0m', $output);
+        $this->assertEquals("\033[1;32mTest\033[0m", $double->display());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
-    public function testWriteLineWithoutAnsiSupportRealCase(): void
+    public function testWriteWithoutAnsiSupportLeavesNoSequence(): void
     {
-        // Create a mock that will force supportsAnsi() to return false
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['supportsAnsi'])
-            ->getMock();
+        $double = new TerminalDouble();
+        $double->terminal->write('Test', Color::Green, true);
 
-        $terminal->method('supportsAnsi')
-            ->willReturn(false);
-
-        ob_start();
-        $terminal->writeLine('Test', 'green');
-        $output = ob_get_clean();
-
-        $this->assertEquals('Test' . PHP_EOL, $output);
+        $this->assertEquals('Test', $double->display());
     }
 
-    public function testClearOnAnsiTerminalAndElse(): void
+    public function testWriteWithoutColorLeavesNoSequence(): void
     {
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['system'])
-            ->getMock();
+        $double = new TerminalDouble('', true);
+        $double->terminal->write('Test');
 
-        $terminal->expects($this->once())
-            ->method('system')
-            ->with($this->equalTo(DIRECTORY_SEPARATOR === '/' ? 'clear' : 'cls'));
-        $terminal->clear();
+        $this->assertEquals('Test', $double->display());
     }
 
-    public function testSpecialMode(): void
+    public function testWriteLineAppendsTheLineBreak(): void
     {
-        // Mock pour éviter d'appeler system()
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['system'])
-            ->getMock();
+        $double = new TerminalDouble('', true);
+        $double->terminal->writeLine('Test', Color::Green);
 
-        $terminal->expects($this->once())
-            ->method('system')
-            ->with('stty -icanon -echo');
-
-        $terminal->specialMode();
+        $this->assertEquals("\033[0;32mTest".PHP_EOL."\033[0m", $double->display());
     }
 
-    public function testNormalMode(): void
+    public function testWriteLineWithoutArgumentBreaksTheLine(): void
     {
-        // Mock pour éviter d'appeler system()
-        $terminal = $this->getMockBuilder(Terminal::class)
-            ->onlyMethods(['system'])
-            ->getMock();
+        $double = new TerminalDouble();
+        $double->terminal->writeLine();
 
-        $terminal->expects($this->once())
-            ->method('system')
-            ->with('stty icanon echo');
-
-        $terminal->normalMode();
+        $this->assertEquals(PHP_EOL, $double->display());
     }
 
-    /**
-     * @throws ReflectionException
-     */
-    public function testSystem(): void
+    public function testClearErasesTheScreenWithoutASubprocess(): void
+    {
+        $double = new TerminalDouble('', true);
+        $double->terminal->clear();
+
+        $this->assertEquals("\033[H\033[2J", $double->display());
+    }
+
+    public function testClearLineReturnsToTheFirstColumn(): void
+    {
+        $double = new TerminalDouble('', true);
+        $double->terminal->clearLine();
+
+        $this->assertEquals("\r\033[2K", $double->display());
+    }
+
+    public function testMoveCursorPlacesItAtTheGivenCoordinates(): void
+    {
+        $double = new TerminalDouble('', true);
+        $double->terminal->moveCursor(3, 12);
+
+        $this->assertEquals("\033[3;12H", $double->display());
+    }
+
+    public function testCoordinatesBelowOneAreRefused(): void
+    {
+        $double = new TerminalDouble('', true);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $double->terminal->moveCursor(0, 1);
+    }
+
+    public function testCursorVisibilityIsDriven(): void
+    {
+        $double = new TerminalDouble('', true);
+        $double->terminal->hideCursor();
+        $double->terminal->showCursor();
+
+        $this->assertEquals("\033[?25l\033[?25h", $double->display());
+    }
+
+    public function testARedirectedDisplayCarriesNoSequence(): void
+    {
+        $double = new TerminalDouble();
+        $double->terminal->clear();
+        $double->terminal->clearLine();
+        $double->terminal->moveCursor(2, 2);
+        $double->terminal->hideCursor();
+        $double->terminal->showCursor();
+        $double->terminal->writeLine('Report', Color::Red, true);
+
+        $this->assertEquals('Report'.PHP_EOL, $double->display());
+        $this->assertStringNotContainsString("\033", $double->display());
+    }
+
+    public function testRawModeIsEnabledAndRestored(): void
+    {
+        $double = new TerminalDouble();
+
+        $this->assertFalse($double->terminal->isRawMode());
+
+        $double->terminal->enableRawMode();
+        $this->assertTrue($double->terminal->isRawMode());
+
+        $double->terminal->disableRawMode();
+        $this->assertFalse($double->terminal->isRawMode());
+        $this->assertEquals(['-g', '-icanon -echo min 1 time 0', 'saved-state'], $double->mode->calls);
+    }
+
+    public function testSupportsAnsiFollowsTheOutput(): void
+    {
+        $this->assertTrue((new TerminalDouble('', true))->terminal->supportsAnsi());
+        $this->assertFalse((new TerminalDouble())->terminal->supportsAnsi());
+    }
+
+    public function testTheOutputAndTheInputAreReachable(): void
+    {
+        $double = new TerminalDouble('a');
+
+        $this->assertSame($double->output, $double->terminal->getOutput());
+        $this->assertEquals('a', $double->terminal->getInput()->readCharacter());
+    }
+
+    public function testATerminalBuiltWithoutArgumentsUsesTheStandardStreams(): void
     {
         $terminal = new Terminal();
-        $reflection = new ReflectionClass(Terminal::class);
-        $method = $reflection->getMethod('system');
 
-        ob_start();
-        $method->invoke($terminal, 'echo Hello');
-        $output = ob_get_clean();
-
-        $this->assertEquals("Hello" . PHP_EOL, $output);
-    }
-
-    public function testSupportsAnsi(): void
-    {
-        $terminal = new Terminal();
         $this->assertIsBool($terminal->supportsAnsi());
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    public function testInputStream(): void
-    {
-        $terminal = new Terminal();
-        $reflection = new ReflectionClass(Terminal::class);
-        $method = $reflection->getMethod('inputStream');
-
-        $this->assertIsResource($method->invoke($terminal));
     }
 }

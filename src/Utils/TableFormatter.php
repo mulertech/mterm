@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Utils;
 
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
@@ -12,16 +13,16 @@ use MulerTech\MTerm\Core\Terminal;
 class TableFormatter
 {
     private Terminal $terminal;
-    private string $headerColor;
-    private string $borderColor;
-    private string $cellColor;
+    private Color $headerColor;
+    private Color $borderColor;
+    private Color $cellColor;
     private int $padding;
 
     public function __construct(
         Terminal $terminal,
-        string $headerColor = Terminal::COLORS['green'],
-        string $borderColor = Terminal::COLORS['blue'],
-        string $cellColor = Terminal::COLORS['white'],
+        Color $headerColor = Color::Green,
+        Color $borderColor = Color::Blue,
+        Color $cellColor = Color::White,
         int $padding = 1,
     ) {
         $this->terminal = $terminal;
@@ -32,7 +33,7 @@ class TableFormatter
     }
 
     /**
-     * Format and terminal a table.
+     * Render a table.
      *
      * @param array<int|string, string>                       $headers Table headers
      * @param array<int, array<int|string, string|int|float>> $rows    Table data rows
@@ -103,10 +104,10 @@ class TableFormatter
      *
      * @param array<int|string, string|int|float> $row          Row data
      * @param array<int, int>                     $columnWidths Array of column widths
-     * @param string                              $color        Color for the row
+     * @param Color                               $color        Color for the row
      * @param bool                                $bold         Whether to make text bold
      */
-    private function drawRow(array $row, array $columnWidths, string $color, bool $bold = false): void
+    private function drawRow(array $row, array $columnWidths, Color $color, bool $bold = false): void
     {
         $line = '|';
         $i = 0;

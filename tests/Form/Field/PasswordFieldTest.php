@@ -2,36 +2,27 @@
 
 namespace MulerTech\MTerm\Tests\Form\Field;
 
-use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\PasswordField;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\Exception;
+use MulerTech\MTerm\Tests\Support\TerminalDouble;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class PasswordFieldTest extends TestCase
 {
     private PasswordField $field;
-    private Terminal $terminal;
 
-    /**
-     * @throws Exception
-     */
     protected function setUp(): void
     {
-        $this->terminal = $this->createMock(Terminal::class);
         $this->field = new PasswordField('password', 'Password');
-        $this->field->setTerminal($this->terminal);
+        $this->field->setTerminal((new TerminalDouble())->terminal);
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testDefaultValues(): void
     {
         $this->assertTrue($this->field->isMaskInput());
         $this->assertEquals('*', $this->field->getMaskChar());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testSetMaskInput(): void
     {
         // Test disabling mask
@@ -44,7 +35,6 @@ class PasswordFieldTest extends TestCase
         $this->assertTrue($this->field->isMaskInput());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testSetMaskChar(): void
     {
         $result = $this->field->setMaskChar('•');
@@ -52,7 +42,6 @@ class PasswordFieldTest extends TestCase
         $this->assertEquals('•', $this->field->getMaskChar());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testProcessInputWithoutMaskInput(): void
     {
         $this->field->setMaskInput(false)->setDefault('secret');
@@ -60,7 +49,6 @@ class PasswordFieldTest extends TestCase
         $this->assertEquals('secret', $result);
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testProcessInputWithoutTerminalSet(): void
     {
         $field = new PasswordField('password', 'Password');
@@ -71,42 +59,67 @@ class PasswordFieldTest extends TestCase
 
     public function testProcessInputWithNonEmptyValue(): void
     {
-        $this->terminal
-            ->method('write')
-            ->withAnyParameters();
-        $this->terminal->expects($this->once())->method('specialMode');
-        $this->terminal
-            ->method('readChar')
-            // Simulate deleting c character
-            ->willReturnOnConsecutiveCalls('s', 'e', 'c', "\x7F", 'r', 'e', 't', PHP_EOL);
-        $this->terminal->expects($this->once())->method('writeLine');
-        $this->terminal->expects($this->once())->method('normalMode');
+        // The c character is deleted by the backspace
+        $double = new TerminalDouble("sec\x7Fret\n");
+        $field = new PasswordField('password', 'Password');
+        $field->setTerminal($double->terminal);
 
-        $result = $this->field->processInput('secret');
-        $this->assertEquals('seret', $result);
+        $this->assertEquals('seret', $field->processInput('secret'));
+        $this->assertEquals("Password: ***\x08 \x08***".PHP_EOL, $double->display());
+        $this->assertFalse($double->terminal->isRawMode());
     }
 
     public function testProcessInputWithEmptyValue(): void
     {
-        $this->terminal
-            ->method('write')
-            ->withAnyParameters();
-        $this->terminal->expects($this->exactly(2))->method('specialMode');
-        $this->terminal
-            ->method('readChar')
-            ->willReturn(PHP_EOL);
-        $this->terminal->expects($this->exactly(2))->method('writeLine');
-        $this->terminal->expects($this->exactly(2))->method('normalMode');
+        $double = new TerminalDouble("\n");
+        $field = new PasswordField('password', 'Password');
+        $field->setTerminal($double->terminal);
 
-        // Test with no default value
-        $result = $this->field->processInput();
-        $this->assertEquals('', $result);
-        $this->field->setDefault('default');
-        $result = $this->field->processInput();
-        $this->assertEquals('default', $result);
+        $this->assertEquals('', $field->processInput());
+
+        $double = new TerminalDouble("\n");
+        $field->setTerminal($double->terminal)->setDefault('default');
+
+        $this->assertEquals('default', $field->processInput());
     }
 
-    #[AllowMockObjectsWithoutExpectations]
+    public function testAnAccentedPasswordIsReadWhole(): void
+    {
+        $double = new TerminalDouble("clé\n");
+        $field = new PasswordField('password', 'Password');
+        $field->setTerminal($double->terminal);
+
+        $this->assertEquals('clé', $field->processInput());
+    }
+
+    public function testAnExhaustedInputEndsTheEntry(): void
+    {
+        $double = new TerminalDouble('ab');
+        $field = new PasswordField('password', 'Password');
+        $field->setTerminal($double->terminal);
+
+        $this->assertEquals('ab', $field->processInput());
+        $this->assertFalse($double->terminal->isRawMode());
+    }
+
+    public function testAControlCharacterIsNotAddedToThePassword(): void
+    {
+        $double = new TerminalDouble("a\x01b\n");
+        $field = new PasswordField('password', 'Password');
+        $field->setTerminal($double->terminal);
+
+        $this->assertEquals('ab', $field->processInput());
+    }
+
+    public function testABackspaceOnAnEmptyPasswordChangesNothing(): void
+    {
+        $double = new TerminalDouble("\x7Fa\n");
+        $field = new PasswordField('password', 'Password');
+        $field->setTerminal($double->terminal);
+
+        $this->assertEquals('a', $field->processInput());
+    }
+
     public function testInheritedValidation(): void
     {
         // Test that validation is inherited from TextField

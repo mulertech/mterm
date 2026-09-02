@@ -2,6 +2,7 @@
 
 namespace MulerTech\MTerm\Form;
 
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Form\Field\FieldInterface;
 use MulerTech\MTerm\Form\Field\PasswordField;
@@ -42,7 +43,7 @@ class FormRenderer
         }
 
         if ($field->getDescription()) {
-            $this->terminal->writeLine($field->getDescription(), 'cyan');
+            $this->terminal->writeLine($field->getDescription(), Color::Cyan);
         }
 
         $value = $this->terminal->read($prompt);
@@ -56,10 +57,10 @@ class FormRenderer
      */
     public function renderErrors(array $errors): void
     {
-        $this->terminal->writeLine('Please correct the following errors:', 'red');
+        $this->terminal->writeLine('Please correct the following errors:', Color::Red);
 
         foreach ($errors as $error) {
-            $this->terminal->writeLine(" - $error", 'red');
+            $this->terminal->writeLine(" - $error", Color::Red);
         }
     }
 

@@ -3,6 +3,7 @@
 namespace MulerTech\MTerm\Tests\Command;
 
 use MulerTech\MTerm\Command\AbstractCommand;
+use MulerTech\MTerm\Core\Color;
 use MulerTech\MTerm\Core\Terminal;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
@@ -83,7 +84,7 @@ class AbstractCommandTest extends TestCase
             ->method('writeLine')
             ->with(
                 $this->equalTo('test-command: Test command description'),
-                $this->equalTo('cyan')
+                $this->equalTo(Color::Cyan)
             );
 
         $command->showHelp();

@@ -62,4 +62,23 @@ class CommandRunnerTest extends TestCase
         $this->assertNotEquals(0, $result['returnCode']);
         $this->assertNotEmpty($result['stderr']);
     }
+
+    public function testRunDirectWritesToTheTerminalItself(): void
+    {
+        ob_start();
+        $returnCode = $this->commandRunner->runDirect('echo "Hello World"');
+        $output = ob_get_clean();
+
+        $this->assertEquals(0, $returnCode);
+        $this->assertStringContainsString('Hello World', (string) $output);
+    }
+
+    public function testRunDirectReportsAFailingCommand(): void
+    {
+        ob_start();
+        $returnCode = $this->commandRunner->runDirect('command_that_does_not_exist_123456789 2>&1');
+        ob_get_clean();
+
+        $this->assertNotEquals(0, $returnCode);
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace MulerTech\MTerm\Form\Field;
 
+use MulerTech\MTerm\Core\Color;
+use MulerTech\MTerm\Core\Input\Key;
 use MulerTech\MTerm\Core\Terminal;
 
 /**
@@ -153,30 +155,43 @@ class SelectField extends AbstractField
     {
         $this->clearErrors();
 
-        $result = $this->handleSelectField($terminal);
+        if ($this->handleSelectField($terminal)) {
+            return $this->getCurrentOption();
+        }
 
-        $defaultValue = $this->getDefault() ?? '';
-        $defaultValue = is_string($defaultValue) ? $defaultValue : '';
+        return $this->defaultOption();
+    }
 
-        return true === $result ? $this->getCurrentOption() : $defaultValue;
+    /**
+     * The default is held as a list, whatever the number of selections.
+     */
+    private function defaultOption(): string
+    {
+        $default = $this->getDefault();
+
+        if (is_array($default)) {
+            $first = reset($default);
+
+            return false === $first ? '' : $first;
+        }
+
+        return is_string($default) ? $default : '';
     }
 
     private function handleSelectField(Terminal $terminal): bool
     {
-        $prompt = $this->buildPrompt();
-        $header = $prompt.PHP_EOL;
+        $header = $this->buildPrompt().PHP_EOL;
 
         if (null !== $this->getDescription()) {
             $header .= $this->getDescription().PHP_EOL;
         }
 
-        $terminal->specialMode();
-        $terminal->write($header, 'cyan');
-        $terminal->write($this->parseInput(''));
+        $terminal->enableRawMode();
+        $this->paint($terminal, $header, '');
 
         $result = $this->handleSelectKeyboardInput($header, $terminal);
 
-        $terminal->normalMode();
+        $terminal->disableRawMode();
 
         return $result;
     }
@@ -184,39 +199,35 @@ class SelectField extends AbstractField
     private function handleSelectKeyboardInput(string $header, Terminal $terminal): bool
     {
         while (true) {
-            $char = $terminal->readChar();
+            $press = $terminal->readKey();
 
-            if (PHP_EOL === $char) { // Enter key
+            if ($press->is(Key::Enter)) {
                 return true;
             }
 
-            if ("\033" === $char) {
-                $this->handleArrowKey($header, $terminal);
-                continue;
+            if ($press->isEndOfInput()) {
+                return false;
             }
 
-            if (' ' === $char) {
-                $terminal->clear();
-                $terminal->write($header, 'cyan');
-                $terminal->write($this->parseInput('space'));
-            }
+            $movement = match (true) {
+                $press->is(Key::Up) => 'up',
+                $press->is(Key::Down) => 'down',
+                $press->is(Key::Space) => 'space',
+                'a' === $press->character => 'a',
+                default => null,
+            };
 
-            if ('a' === $char) {
-                $terminal->clear();
-                $terminal->write($header, 'cyan');
-                $terminal->write($this->parseInput('a'));
+            if (null !== $movement) {
+                $this->paint($terminal, $header, $movement);
             }
         }
     }
 
-    private function handleArrowKey(string $header, Terminal $terminal): void
+    private function paint(Terminal $terminal, string $header, string $input): void
     {
-        $sequence = $terminal->readChar().$terminal->readChar();
-
         $terminal->clear();
-        $terminal->write($header, 'cyan');
-
-        $terminal->write($this->parseInput('[A' === $sequence ? 'up' : 'down'));
+        $terminal->write($header, Color::Cyan);
+        $terminal->write($this->parseInput($input));
     }
 
     /**
