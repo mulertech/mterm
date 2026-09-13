@@ -75,14 +75,14 @@ class CheckboxFieldTest extends TestCase
 
     public function testProcessInputWithCustomValues(): void
     {
-        $this->field->setCheckedValue('oui');
-        $this->field->setUncheckedValue('non');
+        $this->field->setCheckedValue('enabled');
+        $this->field->setUncheckedValue('disabled');
 
         // Test with custom values
-        $this->assertEquals('oui', $this->field->processInput('yes'));
-        $this->assertEquals('oui', $this->field->processInput('oui'));
-        $this->assertEquals('non', $this->field->processInput('no'));
-        $this->assertEquals('non', $this->field->processInput('whatever'));
+        $this->assertEquals('enabled', $this->field->processInput('yes'));
+        $this->assertEquals('enabled', $this->field->processInput('enabled'));
+        $this->assertEquals('disabled', $this->field->processInput('no'));
+        $this->assertEquals('disabled', $this->field->processInput('whatever'));
     }
 
     public function testInputIsTrimmed(): void

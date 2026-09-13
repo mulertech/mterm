@@ -40,7 +40,7 @@ class IndicatorRendererTest extends TestCase
         $double = new TerminalDouble();
 
         (new IndicatorRenderer($double->terminal))->render(
-            Indicator::watch('Sauvegardé', 'à vérifier'),
+            Indicator::watch('Résumé saved', 'reread it'),
             Indicator::watch('Disk usage', 'prune'),
         );
 

@@ -85,11 +85,11 @@ class PasswordFieldTest extends TestCase
 
     public function testAnAccentedPasswordIsReadWhole(): void
     {
-        $double = new TerminalDouble("clé\n");
+        $double = new TerminalDouble("naïve\n");
         $field = new PasswordField('password', 'Password');
         $field->setTerminal($double->terminal);
 
-        $this->assertEquals('clé', $field->processInput());
+        $this->assertEquals('naïve', $field->processInput());
     }
 
     public function testAnExhaustedInputEndsTheEntry(): void

@@ -66,7 +66,7 @@ class TableFormatter
         $widths = [];
         $i = 0;
 
-        // Utiliser des indices entiers explicites
+        // Use explicit integer indices
         foreach ($headers as $header) {
             $widths[$i] = strlen($header);
             ++$i;

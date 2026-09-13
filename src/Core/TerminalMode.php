@@ -89,15 +89,14 @@ class TerminalMode
         register_shutdown_function($this->restore(...));
 
         if (!function_exists('pcntl_signal') || !function_exists('pcntl_async_signals')) {
-            // Sans pcntl, une interruption tue le processus avant tout gestionnaire d'arrêt :
-            // le terminal reste sans écho, et c'est précisément ce que le mode brut sûr
-            // devait empêcher. Une dégradation réelle ne peut pas rester muette, et le
-            // message porte le remède parce que l'utilisateur devant un terminal aveugle
-            // n'est pas en position de chercher.
+            // Without pcntl, an interruption kills the process before any shutdown handler runs:
+            // the terminal is left without echo, which is exactly what safe raw mode exists to
+            // prevent. A real degradation cannot stay silent, and the message carries the remedy
+            // because a user facing a blind terminal is in no position to look it up.
             fwrite(
                 STDERR,
-                'mterm: ext-pcntl absent — une interruption laissera le terminal sans écho.'
-                .' Le rétablir avec « stty sane ».'.PHP_EOL
+                'mterm: ext-pcntl is missing — an interruption will leave the terminal without echo.'
+                .' Restore it with "stty sane".'.PHP_EOL
             );
 
             return;
