@@ -223,7 +223,9 @@ class InputReaderTest extends TestCase
      */
     private function terminalReader(): array
     {
-        $pair = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
+        // Windows pairs only Internet sockets, where the others pair Unix ones
+        $domain = DIRECTORY_SEPARATOR === '/' ? STREAM_PF_UNIX : STREAM_PF_INET;
+        $pair = stream_socket_pair($domain, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
         $this->assertIsArray($pair);
 
         $reader = new class ($pair[0]) extends InputReader {

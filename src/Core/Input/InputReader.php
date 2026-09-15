@@ -98,7 +98,9 @@ class InputReader
      */
     public function discardPending(): void
     {
-        if (!$this->isInteractive()) {
+        // A console nothing can wait upon — Windows' — cannot tell a key typed
+        // ahead from one yet to come: reading would block on the next press.
+        if (!$this->isInteractive() || !($this->waitable ??= $this->isWaitable())) {
             return;
         }
 
