@@ -1,5 +1,9 @@
 # Release notes for mterm
 
+## v2.0.1 - 2026-09-15
+
+- Fixed: `Terminal::clear()` also erases the scrollback (`\033[3J`). Some terminals — PhpStorm's among them — answered the erasing of the screen by pushing it into the scrollback, so the last line of what came before stayed visible above each menu. The menu, which clears before every drawing and every action, now shows alone in every terminal.
+
 ## v2.0.0 - 2026-09-02
 
 - Changed: `Core` is rewritten and its API breaks — hence the major version. `Form`, `Command` and `Utils` keep their behaviour and are only reconnected to the new output.
