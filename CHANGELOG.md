@@ -1,5 +1,10 @@
 # Release notes for mterm
 
+## v2.0.2 - 2026-09-15
+
+- Fixed: a key pressed while a menu action ran — Enter struck after a confirmation, a key pressed to check the program was still alive — stayed in the terminal and answered "Press any key to return." at once, so the menu came back before the action's report could be read. The menu now discards the input typed ahead before that prompt. Only an interactive terminal that can be waited upon is drained: input from a file or a pipe is kept whole, and a Windows console is left as it is.
+- Added: `Terminal::discardPendingInput()` and `InputReader::discardPending()`.
+
 ## v2.0.1 - 2026-09-15
 
 - Fixed: `Terminal::clear()` also erases the scrollback (`\033[3J`). Some terminals — PhpStorm's among them — answered the erasing of the screen by pushing it into the scrollback, so the last line of what came before stayed visible above each menu. The menu, which clears before every drawing and every action, now shows alone in every terminal.
