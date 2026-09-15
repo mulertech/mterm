@@ -253,6 +253,6 @@ class FormRendererTest extends TestCase
         $double = new TerminalDouble('', true);
         (new FormRenderer($double->terminal))->clear();
 
-        $this->assertEquals("\033[H\033[2J", $double->display());
+        $this->assertEquals("\033[H\033[2J\033[3J", $double->display());
     }
 }

@@ -156,7 +156,9 @@ Screen and cursor are driven by ANSI sequences, without forking a subprocess.
 
 ##### `clear(): void`
 
-Erases the screen and puts the cursor back at its top left corner.
+Erases the screen and its scrollback, and puts the cursor back at its top left corner. The
+scrollback goes too: some terminals — PhpStorm's among them — push an erased screen into the
+scrollback, and the last line of what came before would stay visible above what is drawn next.
 
 ```php
 $terminal->clear();
@@ -1114,7 +1116,7 @@ $renderer->renderErrors(['Error 1', 'Error 2']);
 
 #### `clear(): void`
 
-Clears the terminal screen.
+Clears the terminal screen and its scrollback, through `Terminal::clear()`.
 
 ```php
 $renderer->clear();

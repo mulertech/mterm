@@ -84,12 +84,12 @@ class TerminalTest extends TestCase
         $this->assertEquals(PHP_EOL, $double->display());
     }
 
-    public function testClearErasesTheScreenWithoutASubprocess(): void
+    public function testClearErasesTheScreenAndItsScrollbackWithoutASubprocess(): void
     {
         $double = new TerminalDouble('', true);
         $double->terminal->clear();
 
-        $this->assertEquals("\033[H\033[2J", $double->display());
+        $this->assertEquals("\033[H\033[2J\033[3J", $double->display());
     }
 
     public function testClearLineReturnsToTheFirstColumn(): void

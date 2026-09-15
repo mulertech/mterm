@@ -84,11 +84,16 @@ class Terminal
     }
 
     /**
-     * Erase the screen and put the cursor back at its top left corner.
+     * Erase the screen and its scrollback, and put the cursor back at its top
+     * left corner.
+     *
+     * The scrollback goes too: some terminals — PhpStorm's among them — answer
+     * the erasing of the screen by pushing it into the scrollback, and the last
+     * line of what came before stays visible above what is drawn next.
      */
     public function clear(): void
     {
-        $this->writeSequence("\033[H\033[2J");
+        $this->writeSequence("\033[H\033[2J\033[3J");
     }
 
     /**
