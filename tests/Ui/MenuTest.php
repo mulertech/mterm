@@ -3,6 +3,10 @@
 namespace MulerTech\MTerm\Tests\Ui;
 
 use InvalidArgumentException;
+use MulerTech\MTerm\Core\Input\InputReader;
+use MulerTech\MTerm\Core\Output\BufferedOutput;
+use MulerTech\MTerm\Core\Terminal;
+use MulerTech\MTerm\Tests\Support\RecordingTerminalMode;
 use MulerTech\MTerm\Tests\Support\TerminalDouble;
 use MulerTech\MTerm\Ui\Menu;
 use MulerTech\MTerm\Ui\MenuItem;
@@ -186,6 +190,37 @@ class MenuTest extends TestCase
 
         $this->assertStringContainsString('the registry refused the image', $double->display());
         $this->assertStringContainsString('Press any key to return.', $double->display());
+    }
+
+    public function testKeysTypedDuringAnActionDoNotDismissItsReport(): void
+    {
+        $events = [];
+        $reader = new class (TerminalDouble::stream("\n "), $events) extends InputReader {
+            /**
+             * @param resource     $stream
+             * @param list<string> $events
+             */
+            public function __construct($stream, private array &$events)
+            {
+                parent::__construct($stream);
+            }
+
+            public function discardPending(): void
+            {
+                $this->events[] = 'discard';
+            }
+        };
+        $output = new BufferedOutput();
+        $menu = new Menu(new Terminal($output, $reader, new RecordingTerminalMode()), 'Root');
+        $menu->add(MenuItem::action('Deploy', static function () use (&$events, $output): void {
+            $events[] = 'action';
+            $output->write('deployed');
+        }));
+
+        $menu->run();
+
+        $this->assertEquals(['action', 'discard'], $events);
+        $this->assertMatchesRegularExpression('/deployed.*Press any key to return\./s', $output->content());
     }
 
     public function testTheTerminalIsHandedBackWhenTheMenuEnds(): void

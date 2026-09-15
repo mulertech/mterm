@@ -174,6 +174,36 @@ class InputReaderTest extends TestCase
         new InputReader(false);
     }
 
+    public function testKeysTypedAheadOnATerminalAreDropped(): void
+    {
+        [$reader, $keyboard] = $this->terminalReader();
+        fwrite($keyboard, "y\n");
+
+        $reader->discardPending();
+        fwrite($keyboard, 'x');
+
+        $this->assertEquals('x', $reader->readKey()->character);
+    }
+
+    public function testNothingTypedAheadLeavesTheNextKeyToBeRead(): void
+    {
+        [$reader, $keyboard] = $this->terminalReader();
+
+        $reader->discardPending();
+        fwrite($keyboard, 'x');
+
+        $this->assertEquals('x', $reader->readKey()->character);
+    }
+
+    public function testInputWrittenInAdvanceIsKept(): void
+    {
+        $reader = new InputReader(TerminalDouble::stream("\nx"));
+
+        $reader->discardPending();
+
+        $this->assertTrue($reader->readKey()->is(Key::Enter));
+    }
+
     public function testAStreamThatCannotBeWaitedUponIsReadOn(): void
     {
         // A memory stream refuses select(), as a Windows console does
@@ -183,5 +213,26 @@ class InputReaderTest extends TestCase
         rewind($stream);
 
         $this->assertTrue((new InputReader($stream))->readKey()->is(Key::Down));
+    }
+
+    /**
+     * A reader standing for a terminal, over a socket that holds only what has
+     * been written into it — a file would always answer ready.
+     *
+     * @return array{InputReader, resource}
+     */
+    private function terminalReader(): array
+    {
+        $pair = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
+        $this->assertIsArray($pair);
+
+        $reader = new class ($pair[0]) extends InputReader {
+            protected function isInteractive(): bool
+            {
+                return true;
+            }
+        };
+
+        return [$reader, $pair[1]];
     }
 }

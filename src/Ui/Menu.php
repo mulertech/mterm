@@ -175,6 +175,9 @@ class Menu
 
         $this->terminal->enableRawMode();
         $this->terminal->hideCursor();
+        // After raw mode, which releases a line typed without its Enter: a key
+        // struck during the action would otherwise dismiss its report unread.
+        $this->terminal->discardPendingInput();
         $this->terminal->writeLine();
         $this->terminal->write('Press any key to return.', Color::Blue);
         $this->terminal->readKey();

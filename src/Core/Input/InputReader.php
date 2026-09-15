@@ -87,6 +87,42 @@ class InputReader
         };
     }
 
+    /**
+     * Drop what was typed before the question it would answer.
+     *
+     * A key pressed while an action ran — Enter struck after a confirmation, a
+     * key pressed to see whether the program is still alive — waits in the
+     * terminal and answers the next prompt at once, before anyone has read what
+     * the action displayed. Only a terminal is drained: a file or a pipe carries
+     * input written in advance on purpose, every byte of it meant to be read.
+     */
+    public function discardPending(): void
+    {
+        if (!$this->isInteractive()) {
+            return;
+        }
+
+        do {
+            $read = [$this->stream];
+            $write = null;
+            $except = null;
+
+            if (0 >= (int) stream_select($read, $write, $except, 0, 0)) {
+                return;
+            }
+
+            $chunk = fread($this->stream, 1024);
+        } while (false !== $chunk && '' !== $chunk);
+    }
+
+    /**
+     * Whether a person types into this stream, rather than a file or a pipe feeding it.
+     */
+    protected function isInteractive(): bool
+    {
+        return stream_isatty($this->stream);
+    }
+
     private function readByte(): ?string
     {
         $byte = fgetc($this->stream);

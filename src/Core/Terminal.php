@@ -67,6 +67,14 @@ class Terminal
         return $this->input->readKey();
     }
 
+    /**
+     * Drop the keys typed ahead, so the next read answers the question asked next.
+     */
+    public function discardPendingInput(): void
+    {
+        $this->input->discardPending();
+    }
+
     public function write(string $text, ?Color $color = null, bool $bold = false): void
     {
         if (null === $color || !$this->supportsAnsi()) {
