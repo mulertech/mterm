@@ -105,11 +105,26 @@ class TerminalMode
         pcntl_async_signals(true);
 
         foreach ($this->interruptionSignals() as $signal) {
+            // Without restarting the interrupted system call: a wait the signal
+            // breaks must hand control back to the engine, which runs this
+            // handler, rather than resume and hold the signal back.
             pcntl_signal($signal, function (int $signal): void {
                 $this->restore();
+                $this->leaveTheLine();
 
                 exit(128 + $signal);
-            });
+            }, false);
+        }
+    }
+
+    /**
+     * Give the shell back a visible cursor on a line of its own: the program
+     * leaves in the middle of a prompt, and a menu hides the cursor while it runs.
+     */
+    private function leaveTheLine(): void
+    {
+        if (defined('STDOUT') && stream_isatty(STDOUT)) {
+            fwrite(STDOUT, "\033[?25h".PHP_EOL);
         }
     }
 

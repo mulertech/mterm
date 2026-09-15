@@ -51,6 +51,7 @@ class InputReader
      */
     public function readLine(): string
     {
+        $this->awaitInput();
         $line = fgets($this->stream);
 
         return false === $line ? '' : trim($line);
@@ -127,9 +128,32 @@ class InputReader
 
     private function readByte(): ?string
     {
+        $this->awaitInput();
         $byte = fgetc($this->stream);
 
         return false === $byte ? null : $byte;
+    }
+
+    /**
+     * Wait for input on select rather than inside a blocking read.
+     *
+     * PHP retries a read a signal interrupted, so a program waiting for a key
+     * would handle Ctrl+C only once the next key arrived. Select is not retried:
+     * interrupted, it hands control back to the engine, which runs the handler
+     * at once.
+     */
+    private function awaitInput(): void
+    {
+        if (!($this->waitable ??= $this->isWaitable())) {
+            return;
+        }
+
+        do {
+            $read = [$this->stream];
+            $write = null;
+            $except = null;
+            $ready = @stream_select($read, $write, $except, 1);
+        } while (0 === $ready);
     }
 
     /**
