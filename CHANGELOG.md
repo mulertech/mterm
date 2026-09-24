@@ -1,5 +1,14 @@
 # Release notes for mterm
 
+## v2.1.0 - 2026-09-24
+
+- Added: a menu line can carry an indicator. `MenuItem::action()` and `MenuItem::menu()` take an optional `status` closure. It returns the `IndicatorStatus` the line's owner knows at that moment, or `null` when it knows nothing yet. The menu calls it every time it draws, so a line shows the current state rather than the state when the menu was built. The indicator appears to the left of the label, in the colour of its state. As soon as one line of a menu has an indicator, the other lines keep an empty column so the labels stay aligned. `null` draws no symbol, because "nothing known" does not mean "fine".
+- Added: `MenuItem::action(…, awaitsKey: false)` returns to the menu as soon as the action ends, without "Press any key to return.". Use it for an action with no report to show.
+- Added: `MenuItem::hasStatus()`, `MenuItem::status()` and `MenuItem::awaitsKey()`.
+- Fixed: `InputReader::discardPending()` could block. When a key read on its own left the rest of its line in PHP's stream buffer, the drain read those bytes, then waited on the terminal for more input. The program hung until a key was pressed, and that key was lost. The drain now reads without blocking and restores blocking mode afterwards.
+
+Every new parameter is optional and has a default, so existing code keeps its behaviour without changes.
+
 ## v2.0.3 - 2026-09-15
 
 - Fixed: Ctrl+C while a program waited for a key — "Press any key to return.", a menu — did nothing until the next key was pressed. PHP retries a read a signal interrupts, so the handler that restores the terminal only ran once the read returned. Waiting for input now goes through `stream_select`, which a signal interrupts without retry, and the handler runs at once. Streams that cannot be waited upon keep reading directly.
