@@ -129,15 +129,21 @@ class Menu
         $this->terminal->writeLine($path, Color::Cyan, true);
         $this->terminal->writeLine();
 
+        // A column of indicators as soon as one line carries one, the others
+        // left blank in it so that the labels stay aligned.
+        $indicators = [] !== array_filter($this->items, static fn (MenuItem $item): bool => $item->hasStatus());
+
         foreach ($this->items as $position => $item) {
             $selected = $position === $cursor;
             $suffix = null === $item->getSubmenu() ? '' : ' ›';
+            $this->terminal->write($selected ? '❯ ' : '  ', $selected ? Color::Green : null, $selected);
 
-            $this->terminal->writeLine(
-                ($selected ? '❯ ' : '  ').$item->label.$suffix,
-                $selected ? Color::Green : null,
-                $selected
-            );
+            if ($indicators) {
+                $status = $item->status();
+                $this->terminal->write(null === $status ? '  ' : $status->symbol().' ', $status?->color());
+            }
+
+            $this->terminal->writeLine($item->label.$suffix, $selected ? Color::Green : null, $selected);
         }
 
         $this->terminal->writeLine();
@@ -178,6 +184,11 @@ class Menu
         // After raw mode, which releases a line typed without its Enter: a key
         // struck during the action would otherwise dismiss its report unread.
         $this->terminal->discardPendingInput();
+
+        if (!$item->awaitsKey()) {
+            return;
+        }
+
         $this->terminal->writeLine();
         $this->terminal->write('Press any key to return.', Color::Blue);
         $this->terminal->readKey();

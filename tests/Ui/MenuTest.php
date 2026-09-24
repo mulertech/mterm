@@ -8,6 +8,7 @@ use MulerTech\MTerm\Core\Output\BufferedOutput;
 use MulerTech\MTerm\Core\Terminal;
 use MulerTech\MTerm\Tests\Support\RecordingTerminalMode;
 use MulerTech\MTerm\Tests\Support\TerminalDouble;
+use MulerTech\MTerm\Ui\IndicatorStatus;
 use MulerTech\MTerm\Ui\Menu;
 use MulerTech\MTerm\Ui\MenuItem;
 use PHPUnit\Framework\TestCase;
@@ -221,6 +222,61 @@ class MenuTest extends TestCase
 
         $this->assertEquals(['action', 'discard'], $events);
         $this->assertMatchesRegularExpression('/deployed.*Press any key to return\./s', $output->content());
+    }
+
+    public function testALineCarriesItsIndicatorAtItsLeftAndTheOthersStayAligned(): void
+    {
+        $double = new TerminalDouble("\033");
+        $menu = new Menu($double->terminal, 'Root');
+        $menu->add(MenuItem::menu('Serveur', (new Menu($double->terminal, 'Serveur'))->add(MenuItem::action('Système', static fn () => null)), static fn (): IndicatorStatus => IndicatorStatus::Failing));
+        $menu->add(MenuItem::action('Tout vérifier', static fn () => null));
+
+        $menu->run();
+
+        $this->assertStringContainsString('❯ ✘ Serveur ›', $double->display());
+        $this->assertStringContainsString('    Tout vérifier', $double->display());
+    }
+
+    /**
+     * Nothing known is not something fine: no symbol, not a green one.
+     */
+    public function testALineWhoseOwnerKnowsNothingYetShowsNoIndicator(): void
+    {
+        $double = new TerminalDouble("\033");
+        $menu = new Menu($double->terminal, 'Root');
+        $menu->add(MenuItem::action('Parc', static fn () => null, null, static fn (): ?IndicatorStatus => null));
+
+        $menu->run();
+
+        $this->assertStringContainsString('❯   Parc', $double->display());
+    }
+
+    public function testTheIndicatorIsAskedForAtEveryDrawing(): void
+    {
+        $status = null;
+        $double = new TerminalDouble("\n\033");
+        $menu = new Menu($double->terminal, 'Root');
+        $menu->add(MenuItem::action('Tout vérifier', static function () use (&$status): void {
+            $status = IndicatorStatus::Compliant;
+        }, null, static function () use (&$status): ?IndicatorStatus {
+            return $status;
+        }, false));
+
+        $menu->run();
+
+        $this->assertStringContainsString('❯   Tout vérifier', $double->display());
+        $this->assertStringContainsString('❯ ✔ Tout vérifier', $double->display());
+    }
+
+    public function testAnActionWithNothingToShowHandsTheMenuBackAtOnce(): void
+    {
+        $double = new TerminalDouble("\n\033");
+        $menu = new Menu($double->terminal, 'Root');
+        $menu->add(MenuItem::action('Tout vérifier', static fn () => null, null, null, false));
+
+        $menu->run();
+
+        $this->assertStringNotContainsString('Press any key to return.', $double->display());
     }
 
     public function testTheTerminalIsHandedBackWhenTheMenuEnds(): void

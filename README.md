@@ -1500,10 +1500,33 @@ Production › Containers
 
 One line of a menu: either an action to run, or a menu to enter.
 
-#### `action(string $label, callable $action, string $confirmation = null): MenuItem`
+#### `action(string $label, callable $action, ?string $confirmation = null, ?callable $status = null, bool $awaitsKey = true): MenuItem`
 
-An action, and the question to answer before it runs.
+An action, and the question to answer before it runs. Its report stays on
+screen until a key is pressed; with `awaitsKey: false`, an action with nothing
+to show hands the menu back at once.
 
-#### `menu(string $label, Menu $submenu): MenuItem`
+#### `menu(string $label, Menu $submenu, ?callable $status = null): MenuItem`
 
 A submenu, entered with `ENTER` and left with `ESC`.
+
+#### Indicators
+
+`$status` returns the `IndicatorStatus` the line's owner knows now, or `null`
+when it knows nothing yet. It is asked for at every drawing, and drawn at the
+left of the label in the colour of its state; as soon as one line of a menu
+carries one, the others keep a blank column so the labels stay aligned. `null`
+draws no symbol: nothing known is not something fine.
+
+```php
+$menu->add(MenuItem::menu('Serveur', $server, fn (): ?IndicatorStatus => $verdicts->of('server')))
+    ->add(MenuItem::action('Tout vérifier', $checkAll, awaitsKey: false));
+```
+
+```
+mtprod
+
+❯ ✘ Serveur ›
+  ✔ Parc ›
+    Tout vérifier
+```

@@ -105,17 +105,27 @@ class InputReader
             return;
         }
 
-        do {
-            $read = [$this->stream];
-            $write = null;
-            $except = null;
+        // Drained without blocking: a key read alone leaves the rest of its line
+        // in PHP's own buffer, which select reports as ready; a blocking read
+        // would hand those bytes back, then ask the terminal for more and wait
+        // on a user who has typed nothing.
+        stream_set_blocking($this->stream, false);
 
-            if (0 >= (int) stream_select($read, $write, $except, 0, 0)) {
-                return;
-            }
+        try {
+            do {
+                $read = [$this->stream];
+                $write = null;
+                $except = null;
 
-            $chunk = fread($this->stream, 1024);
-        } while (false !== $chunk && '' !== $chunk);
+                if (0 >= (int) stream_select($read, $write, $except, 0, 0)) {
+                    return;
+                }
+
+                $chunk = fread($this->stream, 1024);
+            } while (false !== $chunk && '' !== $chunk);
+        } finally {
+            stream_set_blocking($this->stream, true);
+        }
     }
 
     /**
